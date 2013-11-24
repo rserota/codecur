@@ -27,8 +27,10 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', myRoutes.home)
-app.get('/us', myRoutes.index);
+app.get('/', myRoutes.index)
+app.get('/us', myRoutes.home);
+
+app.post('/hax', myRoutes.hax)
 
 
 
