@@ -5,7 +5,7 @@ module.exports = {
 
 	home : function(request, response){
         console.log('how about dem logs?')
-		response.render('index',{test: "<b>Feeling Curious?</b>"})
+		response.render('home',{test: "<b>Feeling Curious?</b>"})
 	},
 
     hax : function(request, response){
