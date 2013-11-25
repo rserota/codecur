@@ -1,11 +1,21 @@
 doctype 5
 html
-  head
-    title= title
-    link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/stylesheets/home.css')
+    head
+        title= title
+        link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/stylesheets/home.css')
 
-  body
+    body
+        .container
+            .row
+                .myNavbar.col-md-12
+                    ul
+                        li <a href="#">Blog</a>
+                        li <a href="#">Archive</a>
+                        li <a href="#">Projects</a>
+                    ul.pull-right
+                        li <a href="#">About</a>
+
     p= test
 
     script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
