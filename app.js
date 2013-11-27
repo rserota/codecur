@@ -7,6 +7,7 @@ var express = require('express');
 var myRoutes = require('./routes/myRoutes');
 var http = require('http');
 var path = require('path');
+var db = require('./models/mongooseModels.js')
 
 var app = express();
 
@@ -30,6 +31,7 @@ if ('development' == app.get('env')) {
 app.get('/', myRoutes.index)
 app.get('/us', myRoutes.home);
 
+app.post('/submitblog', myRoutes.submitBlog)
 app.post('/hax', myRoutes.hax)
 
 
