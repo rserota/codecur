@@ -6,7 +6,13 @@ module.exports = {
 
 	home : function(request, response){
         console.log('how about dem logs?')
-		response.render('home',{test: "<b>Feeling Curious?</b>"})
+        db.BlogPost.find()
+            .sort({date : -1})
+            .limit(1)
+            .exec(function(error, results){
+                console.log('myRoutes 13 results: ', results)
+                response.render('home',results[0])
+            })
 	},
 
     submitBlog : function(request, response){

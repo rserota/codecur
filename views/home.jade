@@ -8,15 +8,16 @@ html
     body
         .container
             .row
-                .myNavbar.col-md-12
-                    ul
-                        li <a href="#">Blog</a>
-                        li <a href="#">Archive</a>
-                        li <a href="#">Projects</a>
-                    ul.pull-right
-                        li <a href="#">About</a>
+                include myNavbar
+            .row
+                .blogheader.col-md-12
+                    span.blogdate.pull-right #{date.toDateString()}
+                    h1.blogtitle #{title}
+                    hr
+            .row
+                .blogbody.col-md-12!= body
 
-    p= test
+
 
     script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
     script(src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js")
