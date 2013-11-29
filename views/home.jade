@@ -12,15 +12,24 @@ html
             .row
                 .blogheader.col-md-12
                     span.blogdate.pull-right #{date.toDateString()}
-                    h1.blogtitle #{title}
+                    h1.blogtitle= title
                     hr
             .row
                 .blogbody.col-md-12!= body
+            #disqus_thread
+        script.
+            
+            var disqus_shortname = 'codecurious';
+            var disqus_identifier = '#{title}';
+            var disqus_title = '#{title}';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
 
-
-
-    script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
-    script(src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js")
-    script(src='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js')
-    script(src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js")
-    script(src="/javascripts/home.js")
+        script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
+        script(src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js")
+        script(src='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js')
+        script(src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js")
+        script(src="/javascripts/home.js")
