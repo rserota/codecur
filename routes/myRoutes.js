@@ -18,13 +18,21 @@ module.exports = {
             })
 	},
 
+    archivedPost : function(request, response){
+        db.BlogPost.find({url : request.params.url}, function(error, results){
+            console.log('myroutes 23 results: ', results)
+            response.render('article',results[0])
+        })
+    },
+
     submitBlog : function(request, response){
         bcrypt.compare(request.body.potato, breakfast, function(error, result){
-            console.log('myroutes 23 result: ', result)
+            console.log('myroutes 29 result: ', result)
             if (result === true){
 
                 var newBlogPost = new db.BlogPost({
                     title : request.body.title,
+                    url : request.body.url,
                     body : request.body.body,
                     tags : ['testing','testing, 1 2']
                 })
@@ -36,6 +44,22 @@ module.exports = {
                 response.send('nope')
             }
         })
+    },
+
+    archive : function(request, response){
+        db.BlogPost.find()
+            .sort({date : -1})
+            .exec(function(error, results){
+                response.render('archive', {posts : results})
+            })
+    },
+
+    projects : function(request, response){
+        response.render('projects')
+    },
+
+    about : function(request, response){
+        response.render('about')
     },
 
     hax : function(request, response){

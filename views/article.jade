@@ -1,10 +1,9 @@
 doctype 5
 html
     head
-        title Code Curious
+        title= title
         link(rel="shortcut icon", href="../media/images/favicon.ico")
         link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css')
-        link(rel='stylesheet', href='/stylesheets/home.css')
         link(rel='stylesheet', href='/stylesheets/myNavbar.css')
 
     body
@@ -18,10 +17,18 @@ html
                     hr
             .row
                 .blogbody.col-sm-12!= body
-            hr
-            .row
-                .commentlink.col-sm-12 
-                    span.pull-right Questions? Comments? <a href='/us/archive/#{url}'>Join the discussion.</a>
+            #disqus_thread
+        script.
+            
+            var disqus_shortname = 'codecurious';
+            //- var disqus_identifier = '#{url}';
+            //- var disqus_title = '#{title}';
+            //- var disqus_url = '#{url}';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
 
         script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
         //- script(src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js")

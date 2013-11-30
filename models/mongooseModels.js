@@ -7,6 +7,7 @@ var letsMakeADate = function(){
 }
 var BlogPost = mongoose.model('BlogPost', {
     title : {type : String},
+    url : {type : String},
     date : {type : Date, default : letsMakeADate},
     body : {type : String},
     tags : {type : [String]}
