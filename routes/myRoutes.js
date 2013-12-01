@@ -21,7 +21,13 @@ module.exports = {
     archivedPost : function(request, response){
         db.BlogPost.find({url : request.params.url}, function(error, results){
             console.log('myroutes 23 results: ', results)
-            response.render('article',results[0])
+            if (results[0]){
+                response.render('article',results[0])
+            }
+            else{
+                response.status(404)
+                response.redirect('/us')
+            }
         })
     },
 
@@ -46,11 +52,11 @@ module.exports = {
         })
     },
 
-    archive : function(request, response){
+    archives : function(request, response){
         db.BlogPost.find()
             .sort({date : -1})
             .exec(function(error, results){
-                response.render('archive', {posts : results})
+                response.render('archives', {posts : results})
             })
     },
 
@@ -60,10 +66,5 @@ module.exports = {
 
     about : function(request, response){
         response.render('about')
-    },
-
-    hax : function(request, response){
-        console.log('request: ', request.body)
-        response.send('Good stuff')
     }
 }

@@ -30,13 +30,13 @@ if ('development' == app.get('env')) {
 
 app.get('/', myRoutes.index)
 app.get('/us', myRoutes.home);
-app.get('/us/archive', myRoutes.archive)
+app.get('/us/archives', myRoutes.archives)
 app.get('/us/projects', myRoutes.projects)
 app.get('/us/about', myRoutes.about)
-app.get('/us/archive/:url', myRoutes.archivedPost)
+app.get('/us/archives/:url', myRoutes.archivedPost)
 
 app.post('/submitblog', myRoutes.submitBlog)
-app.post('/hax', myRoutes.hax)
+
 
 
 

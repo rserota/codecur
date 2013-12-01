@@ -1,0 +1,14 @@
+section {
+    font-size:16px;
+    line-height: 1.6;
+}
+
+aside {
+    font-size:12px;
+    /*font-family: serif;*/
+}
+
+code {
+    background-color:black;
+    color:rgb(10,200,10);
+}

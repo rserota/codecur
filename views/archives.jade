@@ -1,0 +1,22 @@
+doctype 5
+html
+    head
+        title Archives
+        link(rel="shortcut icon", href="../media/images/favicon.ico")
+        link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/stylesheets/myNavbar.css')
+        link(rel='stylesheet', href='/stylesheets/archives.css')
+    body
+        .container
+            .row
+                include myNavbar
+            .row
+                .col-sm-12
+                    h1 Blog Archives
+                    hr
+                    -for (var i = 0; i < posts.length; i++){
+                        p
+                            span.blogdate.pull-right #{posts[i].date.toDateString()}
+                            h4.blogtitle <a href='/us/archive/#{posts[i].url}'>#{posts[i].title}</a>
+                            hr
+                    -}
