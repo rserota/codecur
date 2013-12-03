@@ -4,11 +4,15 @@ section {
 }
 
 aside {
-    font-size:12px;
+    font-size:13px;
     /*font-family: serif;*/
 }
 
 code {
     background-color:black;
     color:rgb(10,200,10);
+}
+
+#disqus_thread {
+    margin-top:100px;
 }
