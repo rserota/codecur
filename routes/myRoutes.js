@@ -66,5 +66,15 @@ module.exports = {
 
     about : function(request, response){
         response.render('about')
+    },
+
+    audioTest : function(request, response){
+        response.render('audiotest')
+    },
+
+    sendAudio : function(request, response){
+        response.sendfile(require('path').resolve(__dirname + "/../public/media/sounds/household022.wav"),function(error){
+            console.log('error: ', error)
+        })
     }
 }

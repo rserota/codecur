@@ -8,6 +8,7 @@ var myRoutes = require('./routes/myRoutes');
 var http = require('http');
 var path = require('path');
 var db = require('./models/mongooseModels.js')
+var path = require('path')
 
 var app = express();
 
@@ -34,6 +35,8 @@ app.get('/us/archives', myRoutes.archives)
 app.get('/us/projects', myRoutes.projects)
 app.get('/us/about', myRoutes.about)
 app.get('/us/archives/:url', myRoutes.archivedPost)
+app.get('/us/audiotest', myRoutes.audioTest)
+app.get('/us/sendaudio', myRoutes.sendAudio)
 
 app.post('/submitblog', myRoutes.submitBlog)
 
