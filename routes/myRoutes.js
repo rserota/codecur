@@ -73,7 +73,8 @@ module.exports = {
     },
 
     sendAudio : function(request, response){
-        response.sendfile(require('path').resolve(__dirname + "/../public/media/sounds/household022.wav"),function(error){
+        console.log('params',request.params.file)
+        response.sendfile(require('path').resolve(__dirname + "/../public/media/sounds/" + request.params.file),function(error){
             console.log('error: ', error)
         })
     }
