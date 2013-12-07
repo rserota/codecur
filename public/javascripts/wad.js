@@ -155,6 +155,13 @@ var wad = function(arg){
         //////////////////////
     }
 
+    if (arg.filter){
+        this.filter = context.createBiquadFilter()
+        this.filter.type = arg.filter.type
+        this.filter.frequency.value = arg.filter.frequency
+        this.filter.Q.value = arg.filter.q || 1
+    }
+
     this.setVolume = function(volume){
         this.volume = volume;
         // if(this.gain){this.gain.gain.value = volume};
@@ -182,6 +189,9 @@ var wad = function(arg){
         if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
             this.soundSource = context.createOscillator()
             this.soundSource.type = this.source
+            if(arg && arg.pitch){
+                this.soundSource.frequency.value = pitches[arg.pitch]
+            }
         }
         else{
             this.soundSource = context.createBufferSource();
@@ -191,6 +201,10 @@ var wad = function(arg){
         this.nodes = []
         this.nodes.push(this.soundSource)
 
+        if (this.filter){
+            this.nodes.push(this.filter)
+        }
+
         this.gain = context.createGain()
         this.nodes.push(this.gain)
 
@@ -198,7 +212,7 @@ var wad = function(arg){
 
         this.plugEmIn()
 
-        /** this is the envelope **/
+
         this.playEnv()
     }
 
@@ -241,8 +255,12 @@ saw = new wad({
         attack : .5,
         decay : .5,
         sutain : .9,
-        hold : 2,
-        release : 1
+        hold : 1,
+        release : .5
+    },
+    filter : {
+        type :'highpass',
+        frequency : 2000
     }
 })
 
@@ -254,5 +272,9 @@ tri = new wad({
         sutain : .9,
         hold : 2,
         release : 1
+    },
+    filter : {
+        type : 'lowpass',
+        freqency : 1000
     }
 })
