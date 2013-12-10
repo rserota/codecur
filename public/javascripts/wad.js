@@ -39,6 +39,20 @@ var Wad = (function(){
             } 
         }
 
+        if (arg.reverb){
+            this.reverb = {}
+            var request = new XMLHttpRequest();
+            request.open("GET", 'http://localhost:3000/us/sendaudio/longhall.wav', true);
+            request.responseType = "arraybuffer";
+            var that = this
+            request.onload = function() {
+                context.decodeAudioData(request.response, function onSuccess(decodedBuffer){
+                    that.reverb.buffer = decodedBuffer
+                })
+            }
+            request.send();
+        }
+
         this.setVolume = function(volume){
             this.volume = volume;
             // if(this.gain){this.gain.gain.value = volume};
@@ -101,6 +115,12 @@ var Wad = (function(){
 
             this.gain = context.createGain()
             this.nodes.push(this.gain)
+            
+            if (this.reverb){
+                this.reverb.node = context.createConvolver()
+                this.reverb.node.buffer = this.reverb.buffer
+                this.nodes.push(this.reverb.node)
+            }
 
             this.nodes.push(context.destination)
 
@@ -286,8 +306,26 @@ saw = new Wad({
         type : 'lowpass',
         frequency : 2500,
         q : 1
+    },
+    reverb : {}
+})
+
+saw2 = new Wad({
+    source : 'sawtooth',
+    env : {
+        attack : .2,
+        decay : .2,
+        sustain : .9,
+        hold : .3,
+        release : .2
+    },
+    filter : {
+        type : 'lowpass',
+        frequency : 2500,
+        q : 1
     }
 })
+
 
 tri = new Wad({
     source : 'triangle',
