@@ -5,4 +5,7 @@ $(document).ready(function(){
     $('.playbutton2').on('click', function(){
         saw2.play({pitch:$(this).text()})
     })
+    $('.playbutton3').on('click', function(){
+        saw3.play({pitch:$(this).text()})
+    })
 })

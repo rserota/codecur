@@ -40,10 +40,11 @@ var Wad = (function(){
         }
 
         if (arg.reverb){
-            this.reverb = {}
             var request = new XMLHttpRequest();
-            request.open("GET", 'http://localhost:3000/us/sendaudio/longhall.wav', true);
+            request.open("GET", arg.reverb.source, true);
             request.responseType = "arraybuffer";
+            this.reverb = {}
+            this.reverb.wet = arg.reverb.wet || 1
             var that = this
             request.onload = function() {
                 context.decodeAudioData(request.response, function onSuccess(decodedBuffer){
@@ -72,6 +73,9 @@ var Wad = (function(){
         var plugEmIn = function(nodes){
             for (var i=1; i<nodes.length; i++){
                 nodes[i-1].connect(nodes[i])
+                if(nodes[i] instanceof ConvolverNode){
+                    nodes[i-1].connect(nodes[i+2])
+                }
             }
         }
 
@@ -115,11 +119,15 @@ var Wad = (function(){
 
             this.gain = context.createGain()
             this.nodes.push(this.gain)
-            
+
             if (this.reverb){
                 this.reverb.node = context.createConvolver()
                 this.reverb.node.buffer = this.reverb.buffer
+                this.reverb.gain = context.createGain()
+                this.reverb.gain.gain.value = this.reverb.wet
+
                 this.nodes.push(this.reverb.node)
+                this.nodes.push(this.reverb.gain)
             }
 
             this.nodes.push(context.destination)
@@ -299,7 +307,7 @@ saw = new Wad({
         attack : .2,
         decay : .2,
         sustain : .9,
-        hold : .3,
+        hold : 4,
         release : .2
     },
     filter : {
@@ -307,7 +315,10 @@ saw = new Wad({
         frequency : 2500,
         q : 1
     },
-    reverb : {}
+    reverb : {
+        source : 'http://localhost:3000/us/sendaudio/longhall.wav',
+        wet : 1
+    }
 })
 
 saw2 = new Wad({
@@ -316,7 +327,27 @@ saw2 = new Wad({
         attack : .2,
         decay : .2,
         sustain : .9,
-        hold : .3,
+        hold : 4,
+        release : .2
+    },
+    filter : {
+        type : 'lowpass',
+        frequency : 2500,
+        q : 1
+    },
+    reverb : {
+        source : 'http://localhost:3000/us/sendaudio/longhall.wav',
+        wet : .7
+    }
+})
+
+saw3 = new Wad({
+    source : 'sawtooth',
+    env : {
+        attack : .2,
+        decay : .2,
+        sustain : .9,
+        hold : 4,
         release : .2
     },
     filter : {
@@ -325,7 +356,6 @@ saw2 = new Wad({
         q : 1
     }
 })
-
 
 tri = new Wad({
     source : 'triangle',
