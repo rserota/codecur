@@ -1,22 +1,85 @@
 doctype 5
-head
-    link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css')
-    title Audio Test
-body
-    h1 How about that Audio, eh?
-    .playbutton.btn.btn-info C4
-    .playbutton.btn.btn-info G4
-    .playbutton.btn.btn-info B4
-    hr
-    .playbutton2.btn.btn-info C4
-    .playbutton2.btn.btn-info G4
-    .playbutton2.btn.btn-info B4
-    hr
-    .playbutton3.btn.btn-info C4
-    .playbutton3.btn.btn-info G4
-    .playbutton3.btn.btn-info B4      
+html
+    head
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css')
+        link(rel='stylesheet', href='../stylesheets/audiotest.css')
+        link(rel='stylesheet', href='/stylesheets/myNavbar.css')
 
 
-    script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
-    script(src="../javascripts/audiotest.js")
-    script(src="../javascripts/wad.js")
+        title Audio Test
+    body
+        //- h1 How about that Audio, eh?
+        //- .playbutton.btn.btn-info C4
+        //- .playbutton.btn.btn-info G4
+        //- .playbutton.btn.btn-info B4
+        //- .phone.btn.btn-warning phone
+        //- hr
+        //- .playbutton2.btn.btn-info C4
+        //- .playbutton2.btn.btn-info G4
+        //- .playbutton2.btn.btn-info B4
+        //- .phone2.btn.btn-warning phone
+        //- hr
+        //- .playbutton3.btn.btn-info C4
+        //- .playbutton3.btn.btn-info G4
+        //- .playbutton3.btn.btn-info B4      
+        //- .phone3.btn.btn-warning phone
+        //- hr
+
+        .container
+            .row
+                include myNavbar
+            .row
+                .wadmaker.col-xs-6
+                    .row
+                        .createbutton.col-xs-12 Create a Sound
+                            .btn.btn-primary.pull-right Create
+                    hr
+                    .row
+                        .parameters.col-xs-12.col-sm-12
+                            .row
+                                .dropdown.col-xs-6.col-sm-3.text-center
+                                    .row
+                                        .col-xs-12
+                                            .label Source
+                                        .col-xs-12
+                                            .btn.btn-info(role="button", data-toggle="dropdown") Source<span class="caret"></span>
+                                            ul.dropdown-menu(role="menu")
+                                                li <a>Sine</a>
+                                                li <a>Saw</a>
+                                                li <a>Square</a>
+                                                li <a>Triangle</a>
+                                .dropdown.col-xs-6.col-sm-3.text-center
+                                    .row
+                                        .col-xs-12
+                                            .label Attack
+                                        .col-xs-12
+                                            .btn.btn-default(data-toggle="dropdown") Attack
+                                            ul.dropdown-menu(role="menu")
+                                                li <a>Fast</a>
+                                                li <a>Slow</a>
+                                .dropdown.col-xs-6.col-sm-3.text-center
+                                    .row
+                                        .col-xs-12
+                                            .label Release
+                                        .col-xs-12
+                                            .btn.btn-default(data-toggle="dropdown") Release
+                                            ul.dropdown-menu(role="menu")
+                                                li <a>Fast</a>
+                                                li <a>Slow</a>
+                                .dropdown.col-xs-6.col-sm-3.text-center
+                                    .row
+                                        .col-xs-12
+                                            .label Reverb
+                                        .col-xs-12
+                                            .btn.btn-default(data-toggle="dropdown") Reverb
+                                            ul.dropdown-menu(role="menu")
+                                                li <a>None</a>
+                                                li <a>Quiet</a>
+                                                li <a>Loud</a>
+
+
+        script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
+        script(src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js")
+        script(src="../javascripts/audiotest.js")
+        script(src="../javascripts/wad.js")

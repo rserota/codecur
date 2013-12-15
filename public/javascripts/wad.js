@@ -1,18 +1,31 @@
-var Wad = (function(){
 
+
+var Wad = (function(){
+        var impulseURL = 'http://localhost:3000/us/sendaudio/widehall.wav'
+        var request = new XMLHttpRequest();
+        request.open("GET", impulseURL, true);
+        request.responseType = "arraybuffer";
+        request.onload = function() {
+            context.decodeAudioData(request.response, function (decodedBuffer){
+                Wad.reverb = decodedBuffer
+            })
+        }
+        request.send();
+    
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     context = new AudioContext();
 
     var Wad = function(arg){
         this.source = arg.source;
         this.volume = arg.volume || 1 // peak volume. min:0, max:1 (actually max is infinite, but ...just keep it at or below 1)
-        this.env = {
+        this.defaultEnv = { //default envelope, if one is not specified on play
             attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
             decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
             sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
             hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
             release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
         }
+        this.env = this.defaultEnv
         
 
         if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0})){
@@ -22,7 +35,7 @@ var Wad = (function(){
             request.responseType = "arraybuffer";
             var that = this
             request.onload = function() {
-                context.decodeAudioData(request.response, function onSuccess(decodedBuffer){
+                context.decodeAudioData(request.response, function (decodedBuffer){
                     that.decodedBuffer = decodedBuffer
                 })
             }
@@ -35,28 +48,30 @@ var Wad = (function(){
                 type : arg.filter.type,
                 frequency : arg.filter.frequency,
                 Q : arg.filter.q || 1
-
             } 
+            if (arg.filter.env){
+                this.filter.env = {
+                    attack : arg.filter.env.attack,
+                    frequency : arg.filter.env.frequency
+                }
+            }
         }
 
         if (arg.reverb){
-            var request = new XMLHttpRequest();
-            request.open("GET", arg.reverb.source, true);
-            request.responseType = "arraybuffer";
-            this.reverb = {}
-            this.reverb.wet = arg.reverb.wet || 1
-            var that = this
-            request.onload = function() {
-                context.decodeAudioData(request.response, function onSuccess(decodedBuffer){
-                    that.reverb.buffer = decodedBuffer
-                })
+            this.reverb = {
+                wet : arg.reverb.wet || 1
             }
-            request.send();
         }
+
 
         this.setVolume = function(volume){
             this.volume = volume;
             // if(this.gain){this.gain.gain.value = volume};
+        }
+
+        var filterEnv = function(wad){
+            wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.frequency, context.currentTime)
+            wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.env.frequency, context.currentTime+wad.filter.env.attack)
         }
 
         var playEnv = function(wad){
@@ -80,6 +95,7 @@ var Wad = (function(){
         }
 
         this.play = function(arg){
+            this.nodes = []
             if(arg && arg.volume){this.volume = arg.volume}
             if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
                 this.soundSource = context.createOscillator()
@@ -99,17 +115,32 @@ var Wad = (function(){
             }
 
             if(arg && arg.env){
-                this.env.attack = arg.env.attack || this.env.attack
-                this.env.decay = arg.env.decay || this.env.decay
-                this.env.sustain = arg.env.sustain || this.env.sustain
-                this.env.hold = arg.env.hold || this.env.hold
-                this.env.release = arg.env.release || this.env.release 
+                this.env.attack = arg.env.attack || this.defaultEnv.attack
+                this.env.decay = arg.env.decay || this.defaultEnv.decay
+                this.env.sustain = arg.env.sustain || this.defaultEnv.sustain
+                this.env.hold = arg.env.hold || this.defaultEnv.hold
+                this.env.release = arg.env.release || this.defaultEnv.release 
+            }
+            else{
+                this.env = this.defaultEnv
             }
 
-            this.nodes = []
+
             this.nodes.push(this.soundSource)
 
-            if (this.filter){
+            if(arg && arg.filter && this.filter){
+                this.filter.node = context.createBiquadFilter()
+                this.filter.node.type = this.filter.type
+                this.filter.node.frequency.value = arg.filter.frequency || this.filter.frequency
+                this.filter.node.Q.value = arg.filter.q || this.filter.q
+                if (arg.filter.env){
+                    this.filter.env = {
+                        attack : arg.filter.env.attack || this.filter.env.attack,
+                        frequency : arg.filter.env.frequency || this.filter.env.frequency
+                    }
+                }
+                this.nodes.push(this.filter.node)            }
+            else if(this.filter){
                 this.filter.node = context.createBiquadFilter()
                 this.filter.node.type = this.filter.type
                 this.filter.node.frequency.value = this.filter.frequency
@@ -122,7 +153,7 @@ var Wad = (function(){
 
             if (this.reverb){
                 this.reverb.node = context.createConvolver()
-                this.reverb.node.buffer = this.reverb.buffer
+                this.reverb.node.buffer = Wad.reverb
                 this.reverb.gain = context.createGain()
                 this.reverb.gain.gain.value = this.reverb.wet
 
@@ -133,7 +164,7 @@ var Wad = (function(){
             this.nodes.push(context.destination)
 
             plugEmIn(this.nodes)
-
+            if(this.filter && this.filter.env){filterEnv(this)}
             playEnv(this)
         }
 
@@ -270,23 +301,47 @@ var Wad = (function(){
         'B7' :3951.07,
         'C8' :4186.01
     }
+
     return Wad
+    
 })()
 
 
 
 phone = new Wad({
-    source : 'http://localhost:3000/us/sendaudio/household022.wav',
-    env : {
-        attack : 1
-    }
+    source : 'http://localhost:3000/us/sendaudio/A2.wav',
+    reverb : {
+        impulse : 'http://localhost:3000/us/sendaudio/widehall.wav',
+        wet : 1
+    },
+
+})
+
+phone2 = new Wad({
+    source : 'http://localhost:3000/us/sendaudio/A2.wav',
+    reverb : {
+        impulse : 'http://localhost:3000/us/sendaudio/widehall.wav',
+        wet : .6
+    },
+
+})
+
+phone3 = new Wad({
+    source : 'http://localhost:3000/us/sendaudio/A2.wav',
+    reverb : {
+        impulse : 'http://localhost:3000/us/sendaudio/widehall.wav',
+        wet : .2
+    },
+
 })
 
 asm = new Wad({
     source : 'http://localhost:3000/us/sendaudio/asm.mp3',
-    env : {
-        release : 5
+    reverb : {
+        impulse : 'http://localhost:3000/us/sendaudio/longhall.wav',
+        wet : 1
     }
+
 })
 
 tone = new Wad({
@@ -307,63 +362,64 @@ saw = new Wad({
         attack : .2,
         decay : .2,
         sustain : .9,
-        hold : 4,
+        hold : 2,
         release : .2
     },
     filter : {
         type : 'lowpass',
-        frequency : 2500,
-        q : 1
+        frequency : 1200,
+        q : 1,
+        env : {
+            attack : .1,
+            frequency : 3000
+        }
     },
     reverb : {
-        source : 'http://localhost:3000/us/sendaudio/longhall.wav',
         wet : 1
     }
 })
-
 saw2 = new Wad({
     source : 'sawtooth',
     env : {
         attack : .2,
         decay : .2,
         sustain : .9,
-        hold : 4,
+        hold : 2,
         release : .2
     },
     filter : {
         type : 'lowpass',
-        frequency : 2500,
-        q : 1
+        frequency : 1200,
+        q : 1,
+        env : {
+            attack : .4,
+            frequency : 3000
+        }
     },
     reverb : {
-        source : 'http://localhost:3000/us/sendaudio/longhall.wav',
-        wet : .7
+        wet : 1
     }
 })
-
 saw3 = new Wad({
     source : 'sawtooth',
     env : {
         attack : .2,
         decay : .2,
         sustain : .9,
-        hold : 4,
+        hold : 2,
         release : .2
     },
     filter : {
         type : 'lowpass',
-        frequency : 2500,
-        q : 1
+        frequency : 1200,
+        q : 1,
+        env : {
+            attack : .9,
+            frequency : 3000
+        }
+    },
+    reverb : {
+        wet : 1
     }
 })
 
-tri = new Wad({
-    source : 'triangle',
-    env : {
-        attack : .15,
-        decay : .2,
-        sustain : .9,
-        hold : .8,
-        release : .4
-    }
-})
