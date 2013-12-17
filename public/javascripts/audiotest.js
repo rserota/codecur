@@ -17,13 +17,26 @@ var checkValidName = function(){
         $('#wadmakerbutton').removeClass('disabled')
     }
 }
+
+var dropdownClickHandler = function(){
+    var $this = $(this)
+    $this.siblings().removeClass('active')
+    $this.addClass('active')
+    $this.closest('ul').siblings('.relabel').text($this.children('a').text()) 
+}
+
+var glyphiconRemoveClickHandler = function(){
+    wads[$(this).siblings('.h1').text()] = null
+    $(this).closest('.wad').remove()
+    checkValidName()
+}
 $(document).ready(function(){
 
     $(document).on('click', 'ul.dropdown-menu li',function(){
-        var $this = $(this)
-        $this.siblings().removeClass('active')
-        $this.addClass('active')
-        $this.closest('ul').siblings('.relabel').text($this.children('a').text())
+        dropdownClickHandler()
+    })
+    $(document).on('tap', 'ul.dropdown-menu li',function(){
+        dropdownClickHandler()
     })
 
     $('#wadmakerbutton').on('click', function(){
@@ -45,9 +58,10 @@ $(document).ready(function(){
     })
 
     $(document).on('click', '.glyphicon-remove-circle', function(){
-        wads[$(this).siblings('.h1').text()] = null
-        $(this).closest('.wad').remove()
-        checkValidName()
+        glyphiconRemoveClickHandler()
+    })
+    $(document).on('tap', '.glyphicon-remove-circle', function(){
+        glyphiconRemoveClickHandler()
     })
 
     $(document).on('click', '.playbutton', function(){
