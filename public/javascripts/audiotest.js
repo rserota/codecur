@@ -102,5 +102,12 @@ $(document).ready(function(){
     })
 
     $("[rel='tooltip']").tooltip()
+    var is_touch_device = 'ontouchstart' in document.documentElement;
+
+    if (!is_touch_device) {
+        $('body').tooltip({
+            selector: '.help, .searchicons li, .user-prefs, .colour'
+        });
+    }
     
 })
