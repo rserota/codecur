@@ -34,3 +34,9 @@
 .ui-loader {
     display:none;
 }
+
+@media screen and (max-width: 500px){
+    .buttonlabel {
+        display:none;
+    }
+}
