@@ -1,12 +1,28 @@
 .playbutton {
-    height:50px;
-    width: 50px;
-    border-radius: 10px;
-    background-color: rgb(30,200,120)
+
 }
 
 .wadmaker {
     background-color:gray;
-    border-radius:10px;
-    padding: 10px;
+    border-radius:4px;
+    padding: 30px;
+}
+
+#wadname {
+    
+}
+
+.wad {
+    background-color: rgb(200,200,200);
+    border-radius:4px;
+    padding: 30px;
+    margin-bottom: 10px;
+}
+
+.bigicon {
+    font-size: 24px;
+}
+
+.glyphicon-remove-circle:hover{
+    color: gray;
 }
