@@ -31,3 +31,6 @@
     color: gray;
 }
 
+.ui-loader {
+    display:none;
+}
