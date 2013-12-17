@@ -46,7 +46,7 @@ html
                                         .col-xs-12
                                             .label Source
                                         .col-xs-12
-                                            #source.btn.btn-info.relabel(role="button", data-toggle="dropdown") Sine
+                                            #source.btn.btn-info.relabel(title="The shape of the sound wave.", rel="tooltip", data-placement="top", role="button", data-toggle="dropdown") Sine
                                             ul.dropdown-menu(role="menu")
                                                 li.active <a>Sine</a>
                                                 li <a>Sawtooth</a>
@@ -57,7 +57,7 @@ html
                                         .col-xs-12
                                             .label Reverb
                                         .col-xs-12
-                                            #reverb.btn.btn-default.relabel(data-toggle="dropdown") None
+                                            #reverb.btn.btn-default.relabel(title="How much the sound bounces off the walls.", rel="tooltip", data-placement="top", data-toggle="dropdown") None
                                             ul.dropdown-menu(role="menu")
                                                 li.active#noverb <a>None</a>
                                                 li#quietverb <a>Quiet</a>
@@ -67,7 +67,7 @@ html
                                         .col-xs-12
                                             .label Attack
                                         .col-xs-12
-                                            #attack.btn.btn-default.relabel(data-toggle="dropdown") Fast
+                                            #attack.btn.btn-default.relabel(title="How quickly the sound gets loud at the beginning.", rel="tooltip", data-placement="top", data-toggle="dropdown") Fast
                                             ul.dropdown-menu(role="menu")
                                                 li.active#fastattack <a>Fast</a>
                                                 li#slowattack <a>Slow</a>
@@ -76,12 +76,11 @@ html
                                         .col-xs-12
                                             .label Release
                                         .col-xs-12
-                                            #release.btn.btn-default.relabel(data-toggle="dropdown") Fast
+                                            #release.btn.btn-default.relabel(title="How quickly the sound gets quiet at the end.", rel="tooltip", data-placement="top", data-toggle="dropdown") Fast
                                             ul.dropdown-menu(role="menu")
                                                 li.active#fastrelease <a>Fast</a>
                                                 li#slowrelease <a>Slow</a>
                 .wads.col-xs-6
-
 
         include wadtemplate.html
         script(src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js")

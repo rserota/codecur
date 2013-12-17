@@ -63,5 +63,6 @@ $(document).ready(function(){
         checkValidName()
     })
 
-    $('#')
+    $("[rel='tooltip']").tooltip()
+    
 })
