@@ -101,13 +101,10 @@ $(document).ready(function(){
         checkValidName()
     })
 
-    $("[rel='tooltip']").tooltip()
-    var is_touch_device = 'ontouchstart' in document.documentElement;
 
+    var is_touch_device = 'ontouchstart' in document.documentElement;
     if (!is_touch_device) {
-        $('body').tooltip({
-            selector: '.help, .searchicons li, .user-prefs, .colour'
-        });
+        $("[rel='tooltip']").tooltip()
     }
     
 })
