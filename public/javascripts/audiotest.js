@@ -108,3 +108,15 @@ $(document).ready(function(){
     }
     
 })
+
+// function gotStream(stream) {
+
+//     // Create an AudioNode from the stream.
+//     var mediaStreamSource = context.createMediaStreamSource( stream );
+
+//     // Connect it to the destination to hear yourself (or any other node for processing!)
+//     mediaStreamSource.connect( context.destination );
+// }
+
+// navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+// navigator.getUserMedia( {audio:true}, gotStream );

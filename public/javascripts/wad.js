@@ -1,34 +1,38 @@
 
 
 var Wad = (function(){
-        var impulseURL = 'http://localhost:3000/us/sendaudio/widehall.wav'
-        var request = new XMLHttpRequest();
-        request.open("GET", impulseURL, true);
-        request.responseType = "arraybuffer";
-        request.onload = function() {
-            context.decodeAudioData(request.response, function (decodedBuffer){
-                Wad.reverb = decodedBuffer
-            })
-        }
-        request.send();
+    var impulseURL = 'http://localhost:3000/us/sendaudio/widehall.wav'
+    var request = new XMLHttpRequest();
+    request.open("GET", impulseURL, true);
+    request.responseType = "arraybuffer";
+    request.onload = function() {
+        context.decodeAudioData(request.response, function (decodedBuffer){
+            Wad.reverb = decodedBuffer
+        })
+    }
+    request.send();
     
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     context = new AudioContext();
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+
+
+
 
     var Wad = function(arg){
         this.source = arg.source;
         this.volume = arg.volume || 1 // peak volume. min:0, max:1 (actually max is infinite, but ...just keep it at or below 1)
-        this.defaultEnv = { //default envelope, if one is not specified on play
+        this.env = { //default envelope, if one is not specified on play
             attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
             decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
             sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
             hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
             release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
         }
-        this.env = this.defaultEnv
+        this.defaultEnv = this.env
         
 
-        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0})){
+        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0})){
             /** fetch resources **/
             var request = new XMLHttpRequest();
             request.open("GET", this.source, true);
@@ -55,6 +59,7 @@ var Wad = (function(){
                     frequency : arg.filter.env.frequency
                 }
             }
+            this.defaultFilter = this.filter
         }
 
         if (arg.reverb){
@@ -63,10 +68,46 @@ var Wad = (function(){
             }
         }
 
+        /** special handling for mic input **/
+        if(this.source === 'mic'){
+            var that = this
+            navigator.getUserMedia({audio:true}, function(stream){
+                console.log(that)
+                that.nodes = []
+                that.mediaStreamSource = context.createMediaStreamSource(stream)
+                that.nodes.push(that.mediaStreamSource)
+                that.gain = context.createGain()
+                that.gain.gain.value = that.volume
+                that.nodes.push(that.gain)
+
+                if (that.filter){
+                    that.filter.node = context.createBiquadFilter()
+                    that.filter.node.type = that.filter.type
+                    that.filter.node.frequency.value = that.filter.frequency
+                    that.filter.node.Q.value = that.filter.q
+                    that.nodes.push(that.filter.node)
+                }
+
+                if (that.reverb){
+                    that.reverb.node = context.createConvolver()
+                    that.reverb.node.buffer = Wad.reverb
+                    that.reverb.gain = context.createGain()
+                    that.reverb.gain.gain.value = that.reverb.wet
+
+                    that.nodes.push(that.reverb.node)
+                    that.nodes.push(that.reverb.gain)
+                }
+                that.nodes.push(context.destination)
+
+                plugEmIn(that.nodes)
+                
+            });
+        }
+        /////////////////////////////////////
 
         this.setVolume = function(volume){
             this.volume = volume;
-            // if(this.gain){this.gain.gain.value = volume};
+            if(this.gain){this.gain.gain.value = volume};
         }
 
         var filterEnv = function(wad){
@@ -84,7 +125,6 @@ var Wad = (function(){
             wad.soundSource.start(context.currentTime);
         }
 
-        this.nodes = []
         var plugEmIn = function(nodes){
             for (var i=1; i<nodes.length; i++){
                 nodes[i-1].connect(nodes[i])
@@ -135,12 +175,19 @@ var Wad = (function(){
                 this.filter.node.Q.value = arg.filter.q || this.filter.q
                 if (arg.filter.env){
                     this.filter.env = {
-                        attack : arg.filter.env.attack || this.filter.env.attack,
-                        frequency : arg.filter.env.frequency || this.filter.env.frequency
+                        attack : arg.filter.env.attack || this.defaultFilter.env.attack,
+                        frequency : arg.filter.env.frequency || this.defaultFilter.env.frequency
                     }
                 }
-                this.nodes.push(this.filter.node)            }
+                else if (this.defaultFilter.env){
+                    this.filter.env = this.defaultFilter.env
+                }
+                this.nodes.push(this.filter.node)            
+            }
             else if(this.filter){
+                if(this.defaultFilter.env){
+                    this.filter.env = this.defaultFilter.env
+                }
                 this.filter.node = context.createBiquadFilter()
                 this.filter.node.type = this.filter.type
                 this.filter.node.frequency.value = this.filter.frequency
@@ -306,7 +353,16 @@ var Wad = (function(){
     
 })()
 
-
+mic = new Wad({
+    source :'mic',
+    filter : {
+        type : 'highpass',
+        frequency : 600
+    }
+    // reverb : {
+    //     wet : .5
+    // }
+})
 
 phone = new Wad({
     source : 'http://localhost:3000/us/sendaudio/A2.wav',
