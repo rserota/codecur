@@ -22,6 +22,7 @@ var Wad = (function(){
     var Wad = function(arg){
         this.source = arg.source;
         this.volume = arg.volume || 1 // peak volume. min:0, max:1 (actually max is infinite, but ...just keep it at or below 1)
+        this.defaultVolume = this.volume
         this.env = { //default envelope, if one is not specified on play
             attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
             decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
@@ -65,6 +66,12 @@ var Wad = (function(){
         if (arg.reverb){
             this.reverb = {
                 wet : arg.reverb.wet || 1
+            }
+        }
+
+        if (arg.panning){
+            this.panning = {
+                location : arg.panning
             }
         }
 
@@ -137,6 +144,7 @@ var Wad = (function(){
         this.play = function(arg){
             this.nodes = []
             if(arg && arg.volume){this.volume = arg.volume}
+            else {this.volume = this.defaultVolume}
             if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
                 this.soundSource = context.createOscillator()
                 this.soundSource.type = this.source
@@ -206,6 +214,13 @@ var Wad = (function(){
 
                 this.nodes.push(this.reverb.node)
                 this.nodes.push(this.reverb.gain)
+            }
+
+            if ((arg && arg.panning) || this.panning){
+                this.panning.node = context.createPanner()
+                var panning = (arg && arg.panning) ? arg.panning : this.panning.location
+                this.panning.node.setPosition(panning, 0, 0)
+                this.nodes.push(this.panning.node)
             }
 
             this.nodes.push(context.destination)
@@ -353,23 +368,24 @@ var Wad = (function(){
     
 })()
 
-mic = new Wad({
-    source :'mic',
-    filter : {
-        type : 'highpass',
-        frequency : 600
-    }
-    // reverb : {
-    //     wet : .5
-    // }
-})
+// mic = new Wad({
+//     source :'mic',
+//     filter : {
+//         type : 'highpass',
+//         frequency : 600
+//     }
+//     reverb : {
+//         wet : .5
+//     }
+// })
 
 phone = new Wad({
     source : 'http://localhost:3000/us/sendaudio/A2.wav',
     reverb : {
         impulse : 'http://localhost:3000/us/sendaudio/widehall.wav',
-        wet : 1
+        wet : .6
     },
+    panning : 1
 
 })
 
@@ -379,6 +395,7 @@ phone2 = new Wad({
         impulse : 'http://localhost:3000/us/sendaudio/widehall.wav',
         wet : .6
     },
+    panning : -1
 
 })
 
@@ -386,8 +403,9 @@ phone3 = new Wad({
     source : 'http://localhost:3000/us/sendaudio/A2.wav',
     reverb : {
         impulse : 'http://localhost:3000/us/sendaudio/widehall.wav',
-        wet : .2
+        wet : .6
     },
+    panning : -5
 
 })
 
