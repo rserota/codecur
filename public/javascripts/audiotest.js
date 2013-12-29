@@ -97,6 +97,12 @@ $(document).ready(function(){
         wads[wadname].play({pitch : notename})
     })
 
+    $(document).on('tap', '.stopbutton', function(){
+        var wadname = $(this).closest('.wad').find('.h1').text()
+        console.log('wadname: ',wadname)
+        wads[wadname].stop()
+    })
+
     $('#wadname').on('keyup', function(event){
         checkValidName()
     })

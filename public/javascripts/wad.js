@@ -14,7 +14,7 @@ var Wad = (function(){
     
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     context = new AudioContext();
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+    navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia
 
 
 
@@ -166,7 +166,7 @@ var Wad = (function(){
             wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack)
             wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay)
             wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
-            wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
+            // wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
             ///////////////////////////
             wad.soundSource.start(context.currentTime);
         }
@@ -299,8 +299,13 @@ var Wad = (function(){
 
     //If multiple instances of a sound are playing simultaneously, stopSound only can stop the most recent one
         this.stop = function(){
-            this.gain.gain.linearRampToValueAtTime(.0001, context.currentTime+this.env.release)
-            this.soundSource.stop(context.currentTime+this.env.release)
+            if(!(this.source === 'mic')){
+                this.gain.gain.linearRampToValueAtTime(.0001, context.currentTime+this.env.release)
+                this.soundSource.stop(context.currentTime+this.env.release)             
+            }
+            else {
+                this.mediaStreamSource.disconnect(0)
+            }
         }
     }
 
