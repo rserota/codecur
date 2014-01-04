@@ -76,7 +76,7 @@ var Wad = (function(){
             }
         }
 
-        if (arg.panning){
+        if ('panning' in arg){
             this.panning = {
                 location : arg.panning
             }
@@ -135,21 +135,21 @@ var Wad = (function(){
         }
         /////////////////////////////////////
 
-        if (arg.lfo){
-            this.lfo = {}
-            if (arg.lfo.volume){
-                this.lfo.volume = {
-                    source : arg.lfo.volume.source || 'sine',
-                    pitch : arg.lfo.volume.pitch || 1,
-                    volume : arg.lfo.volume.volume || 5,
-                    env : {
-                        attack : arg.lfo.volume.attack || 0,
-                        hold : this.env.hold
-                    }
-                }
+        // if (arg.lfo){
+        //     this.lfo = {}
+        //     if (arg.lfo.volume){
+        //         this.lfo.volume = {
+        //             source : arg.lfo.volume.source || 'sine',
+        //             pitch : arg.lfo.volume.pitch || 1,
+        //             volume : arg.lfo.volume.volume || 5,
+        //             env : {
+        //                 attack : arg.lfo.volume.attack || 0,
+        //                 hold : this.env.hold
+        //             }
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
         this.setVolume = function(volume){
             this.volume = volume;
