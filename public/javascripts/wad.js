@@ -1,7 +1,25 @@
 
 
 var Wad = (function(){
-    var impulseURL = 'http://localhost:3000/us/sendaudio/widehall.wav'
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    context = new AudioContext();
+    navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia
+
+    var bufferSize = 2 * context.sampleRate,
+    noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate),
+    output = noiseBuffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+    }
+
+    var whiteNoise = context.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+    // whiteNoise.start(0);
+
+    whiteNoise.connect(context.destination);
+
+    var impulseURL = 'http://www.codecur.io/us/sendaudio/widehall.wav'
     var request = new XMLHttpRequest();
     request.open("GET", impulseURL, true);
     request.responseType = "arraybuffer";
@@ -12,9 +30,6 @@ var Wad = (function(){
     }
     request.send();
     
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    context = new AudioContext();
-    navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia
 
 
 
@@ -40,7 +55,7 @@ var Wad = (function(){
         this.defaultEnv = this.env
         
 
-        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0})){
+        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
             /** fetch resources **/
             var request = new XMLHttpRequest();
             request.open("GET", this.source, true);
@@ -53,6 +68,10 @@ var Wad = (function(){
             }
             request.send();
             //////////////////////
+        }
+
+        if(this.source === 'noise'){
+            this.decodedBuffer = noiseBuffer
         }
 
         if (arg.filter){
@@ -201,7 +220,10 @@ var Wad = (function(){
             }
             else{
                 this.soundSource = context.createBufferSource();
-                this.soundSource.buffer = that.decodedBuffer;    
+                this.soundSource.buffer = this.decodedBuffer;
+                if(this.source === 'noise'){
+                    this.soundSource.loop = true
+                }  
             }
 
             if(arg && arg.env){
