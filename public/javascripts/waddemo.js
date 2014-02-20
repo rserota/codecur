@@ -81,6 +81,6 @@ var playPattern = function(pattern){
 
 setInterval(function(){
     playPattern(pattern)
-}, 4000)
+}, 8000)
 
 
