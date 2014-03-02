@@ -2,7 +2,7 @@
 
 var Wad = (function(){
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    context = new AudioContext();
+    context = new window.AudioContext();
     navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia
 
     var bufferSize = 2 * context.sampleRate,
