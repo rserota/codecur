@@ -187,7 +187,7 @@ var Wad = (function(){
             wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
             ///////////////////////////
             wad.soundSource.start(context.currentTime);
-            // wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
+            wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
         }
 
         var plugEmIn = function(nodes){
