@@ -12,12 +12,12 @@ var Wad = (function(){
         output[i] = Math.random() * 2 - 1;
     }
 
-    var whiteNoise = context.createBufferSource();
-    whiteNoise.buffer = noiseBuffer;
-    whiteNoise.loop = true;
-    // whiteNoise.start(0);
+    // var whiteNoise = context.createBufferSource();
+    // whiteNoise.buffer = noiseBuffer;
+    // whiteNoise.loop = true;
+    // // whiteNoise.start(0);
 
-    whiteNoise.connect(context.destination);
+    // whiteNoise.connect(context.destination);
 
     var impulseURL = 'http://www.codecur.io/us/sendaudio/widehall.wav'
     var request = new XMLHttpRequest();
@@ -53,26 +53,6 @@ var Wad = (function(){
             release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
         }
         this.defaultEnv = this.env
-        
-
-        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
-            /** fetch resources **/
-            var request = new XMLHttpRequest();
-            request.open("GET", this.source, true);
-            request.responseType = "arraybuffer";
-            var that = this
-            request.onload = function() {
-                context.decodeAudioData(request.response, function (decodedBuffer){
-                    that.decodedBuffer = decodedBuffer
-                })
-            }
-            request.send();
-            //////////////////////
-        }
-
-        if(this.source === 'noise'){
-            this.decodedBuffer = noiseBuffer
-        }
 
         if (arg.filter){
             this.filter = {
@@ -95,7 +75,7 @@ var Wad = (function(){
             }
         }
 
-        if ('panning' in arg){
+        if (arg.panning){
             this.panning = {
                 location : arg.panning
             }
@@ -116,6 +96,26 @@ var Wad = (function(){
                 magnitude : arg.tremolo.magnitude || 5,
                 attack : arg.tremolo.attack || 1
             }
+        }
+        
+
+        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
+            /** fetch resources **/
+            var request = new XMLHttpRequest();
+            request.open("GET", this.source, true);
+            request.responseType = "arraybuffer";
+            var that = this
+            request.onload = function() {
+                context.decodeAudioData(request.response, function (decodedBuffer){
+                    that.decodedBuffer = decodedBuffer
+                })
+            }
+            request.send();
+            //////////////////////
+        }
+
+        if(this.source === 'noise'){
+            this.decodedBuffer = noiseBuffer
         }
         /** special handling for mic input **/
         if(this.source === 'mic'){
@@ -185,9 +185,9 @@ var Wad = (function(){
             wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack)
             wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay)
             wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
-            // wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
             ///////////////////////////
             wad.soundSource.start(context.currentTime);
+            // wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
         }
 
         var plugEmIn = function(nodes){
