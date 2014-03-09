@@ -1,24 +1,27 @@
 
 
 var Wad = (function(){
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    context = new window.AudioContext();
-    navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia
 
+/** Let's do the vendor-prefix dance. **/
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    context = new AudioContext();
+    navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia
+/////////////////////////////////////////
+
+
+/** Pre-render a noise buffer instead of generating noise on the fly. **/
     var bufferSize = 2 * context.sampleRate,
     noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate),
     output = noiseBuffer.getChannelData(0);
     for (var i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1;
     }
+/////////////////////////////////////////////////////////////////////////
 
-    // var whiteNoise = context.createBufferSource();
-    // whiteNoise.buffer = noiseBuffer;
-    // whiteNoise.loop = true;
-    // // whiteNoise.start(0);
 
-    // whiteNoise.connect(context.destination);
-
+/** Grab the reverb impulse response file from a server.
+You may want to change this URL to serve files from your own server.
+Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
     var impulseURL = 'http://www.codecur.io/us/sendaudio/widehall.wav'
     var request = new XMLHttpRequest();
     request.open("GET", impulseURL, true);
@@ -29,14 +32,13 @@ var Wad = (function(){
         })
     }
     request.send();
-    
-
-
+////////////////////////////////////////////////////////////////////////
 
 
     var Wad = function(arg){
+/** Set basic Wad properties **/
         this.source = arg.source;
-        this.destination = arg.destination || context.destination
+        this.destination = arg.destination || context.destination // the last node the sound is routed to
         this.volume = arg.volume || 1 // peak volume. min:0, max:1 (actually max is infinite, but ...just keep it at or below 1)
         this.defaultVolume = this.volume
         if(arg.pitch && arg.pitch in Wad.pitches){
@@ -75,7 +77,7 @@ var Wad = (function(){
             }
         }
 
-        if (arg.panning){
+        if ('panning' in arg){
             this.panning = {
                 location : arg.panning
             }
@@ -97,10 +99,11 @@ var Wad = (function(){
                 attack : arg.tremolo.attack || 1
             }
         }
-        
+////////////////////////////////
 
+
+/** If the source is not a pre-defined value, assume it is a URL for an audio file, and grab it now. **/
         if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
-            /** fetch resources **/
             var request = new XMLHttpRequest();
             request.open("GET", this.source, true);
             request.responseType = "arraybuffer";
@@ -111,13 +114,18 @@ var Wad = (function(){
                 })
             }
             request.send();
-            //////////////////////
         }
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+/** If the Wad's source is noise, set the Wad's buffer to the noise buffer we created earlier. **/
         if(this.source === 'noise'){
             this.decodedBuffer = noiseBuffer
         }
-        /** special handling for mic input **/
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/** If the Wad's source is the microphone, the rest of the setup happens here. **/
         if(this.source === 'mic'){
             var that = this
             navigator.getUserMedia({audio:true}, function(stream){
@@ -152,29 +160,16 @@ var Wad = (function(){
                 
             });
         }
-        /////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////        
 
-        // if (arg.lfo){
-        //     this.lfo = {}
-        //     if (arg.lfo.volume){
-        //         this.lfo.volume = {
-        //             source : arg.lfo.volume.source || 'sine',
-        //             pitch : arg.lfo.volume.pitch || 1,
-        //             volume : arg.lfo.volume.volume || 5,
-        //             env : {
-        //                 attack : arg.lfo.volume.attack || 0,
-        //                 hold : this.env.hold
-        //             }
-        //         }
-
-        //     }
-        // }
 
         this.setVolume = function(volume){
             this.volume = volume;
             if(this.gain){this.gain.gain.value = volume};
         }
 
+/** When a note is played, these two functions will schedule changes in volume and filter frequency,
+as specified by the volume envelope and filter envelope **/
         var filterEnv = function(wad){
             wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.frequency, context.currentTime)
             wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.env.frequency, context.currentTime+wad.filter.env.attack)
@@ -185,11 +180,14 @@ var Wad = (function(){
             wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack)
             wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay)
             wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
-            ///////////////////////////
             wad.soundSource.start(context.currentTime);
             wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
         }
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+/** When all the nodes are set up for this Wad, this function plugs them into each other,
+ with special handling for reverb (ConvolverNode). **/
         var plugEmIn = function(nodes){
             for (var i=1; i<nodes.length; i++){
                 nodes[i-1].connect(nodes[i])
@@ -198,7 +196,13 @@ var Wad = (function(){
                 }
             }
         }
+/////////////////////////////////////////////////////////////////////////////////////////
 
+
+/** the play() method will create the various nodes that are required for this Wad to play,
+set properties on those nodes according to the constructor arguments and play() arguments,
+plug the nodes into each other with plugEmIn(),
+then finally play the sound by calling playEnv() **/
         this.play = function(arg){
             this.nodes = []
             if(arg && arg.volume){this.volume = arg.volume}
@@ -226,6 +230,11 @@ var Wad = (function(){
                 }  
             }
 
+            this.nodes.push(this.soundSource)
+
+/**  sets the volume envelope based on the play() arguments if present,
+or defaults to the constructor arguments if the volume envelope is not set on play() **/
+
             if(arg && arg.env){
                 this.env.attack = arg.env.attack || this.defaultEnv.attack
                 this.env.decay = arg.env.decay || this.defaultEnv.decay
@@ -236,9 +245,11 @@ var Wad = (function(){
             else{
                 this.env = this.defaultEnv
             }
+////////////////////////////////////////////////////////////////////////////////////////
 
-            this.nodes.push(this.soundSource)
 
+/**  sets up the filter and filter envelope based on the play() argument if present,
+or defaults to the constructor argument if the filter and filter envelope are not set on play() **/
             if(arg && arg.filter && this.filter){
                 this.filter.node = context.createBiquadFilter()
                 this.filter.node.type = this.filter.type
@@ -265,11 +276,13 @@ var Wad = (function(){
                 this.filter.node.Q.value = this.filter.q
                 this.nodes.push(this.filter.node)
             }
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-            this.gain = context.createGain()
+
+            this.gain = context.createGain() // sets up the gain node
             this.nodes.push(this.gain)
 
-            if (this.reverb){
+            if (this.reverb){ // sets up reverb
                 this.reverb.node = context.createConvolver()
                 this.reverb.node.buffer = Wad.reverb
                 this.reverb.gain = context.createGain()
@@ -279,20 +292,23 @@ var Wad = (function(){
                 this.nodes.push(this.reverb.gain)
             }
 
+/**  sets panning based on the play() argument if present, or defaults to the constructor argument if panning is not set on play **/
             if ((arg && arg.panning) || this.panning){
                 this.panning.node = context.createPanner()
                 var panning = (arg && arg.panning) ? arg.panning : this.panning.location
                 this.panning.node.setPosition(panning, 0, 0)
                 this.nodes.push(this.panning.node)
             }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
             this.nodes.push(this.destination)
 
-            plugEmIn(this.nodes)
+            plugEmIn(this.nodes) 
             if(this.filter && this.filter.env){filterEnv(this)}
             playEnv(this)
 
-            if (this.vibrato){
+            if (this.vibrato){ //sets up vibrato LFO
                 this.vibrato.wad = new Wad({
                     source : this.vibrato.shape,
                     pitch : this.vibrato.speed,
@@ -305,7 +321,7 @@ var Wad = (function(){
                 this.vibrato.wad.play()
             }
 
-            if (this.tremolo){
+            if (this.tremolo){ //sets up tremolo LFO
                 this.tremolo.wad = new Wad({
                     source : this.tremolo.shape,
                     pitch : this.tremolo.speed,
@@ -318,8 +334,9 @@ var Wad = (function(){
                 this.tremolo.wad.play()
             }
         }
+//////////////////////////////////////////////////////////////////////////////////////////
 
-    //If multiple instances of a sound are playing simultaneously, stopSound only can stop the most recent one
+/** If multiple instances of a sound are playing simultaneously, stop() only can stop the most recent one **/
         this.stop = function(){
             if(!(this.source === 'mic')){
                 this.gain.gain.linearRampToValueAtTime(.0001, context.currentTime+this.env.release)
@@ -330,7 +347,9 @@ var Wad = (function(){
             }
         }
     }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/** This object is a mapping of note names to frequencies. **/ 
     Wad.pitches = {
         'A0' :27.5000, 
         'A#0' :29.1352,
@@ -456,6 +475,12 @@ var Wad = (function(){
         'Bb7' :3729.31,
         'B7' :3951.07,
         'C8' :4186.01
+    }
+//////////////////////////////////////////////////////////////
+
+
+    Wad.presets = {
+        "high-hat" : {source : 'noise', env : { hold : .06}, filter : { type : 'highpass', frequency : 400}}
     }
 
     return Wad
