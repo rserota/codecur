@@ -4,6 +4,7 @@
  */
 
 var express = require('express');
+var cors = require('cors')
 var myRoutes = require('./routes/myRoutes');
 var http = require('http');
 var path = require('path');
@@ -23,6 +24,7 @@ app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors())
 
 // development only
 if ('development' == app.get('env')) {
@@ -44,7 +46,7 @@ app.get('/us/projects', myRoutes.projects)
 app.get('/us/about', myRoutes.about)
 app.get('/us/archives/:url', myRoutes.archivedPost)
 app.get('/us/audiotest', myRoutes.audioTest)
-app.get('/us/sendaudio/:file', allowCrossDomain, myRoutes.sendAudio)
+app.get('/us/sendaudio/:file', myRoutes.sendAudio)
 
 app.post('/submitblog', myRoutes.submitBlog)
 
