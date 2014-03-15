@@ -29,6 +29,14 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', config.allowedDomains);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+}
+
 app.get('/', myRoutes.index)
 app.get('/us', myRoutes.home);
 app.get('/us/archives', myRoutes.archives)
@@ -36,7 +44,7 @@ app.get('/us/projects', myRoutes.projects)
 app.get('/us/about', myRoutes.about)
 app.get('/us/archives/:url', myRoutes.archivedPost)
 app.get('/us/audiotest', myRoutes.audioTest)
-app.get('/us/sendaudio/:file', myRoutes.sendAudio)
+app.get('/us/sendaudio/:file', allowCrossDomain, myRoutes.sendAudio)
 
 app.post('/submitblog', myRoutes.submitBlog)
 
