@@ -35,47 +35,99 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 ////////////////////////////////////////////////////////////////////////
 
     var constructEnv = function(that, arg){   
-        this.env = { //default envelope, if one is not specified on play
+        that.env = { //default envelope, if one is not specified on play
             attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
             decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
             sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
             hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
             release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
         }
-        this.defaultEnv = this.env
+        that.defaultEnv = that.env
     }
 
     var constructFilter = function(that, arg){   
-        that.filter = {
-            type : arg.filter.type,
-            frequency : arg.filter.frequency,
-            Q : arg.filter.q || 1
-        } 
-        if (arg.filter.env){
-            that.filter.env = {
-                attack : arg.filter.env.attack,
-                frequency : arg.filter.env.frequency
+        if (arg.filter){
+            that.filter = {
+                type : arg.filter.type,
+                frequency : arg.filter.frequency,
+                Q : arg.filter.q || 1
+            } 
+            if (arg.filter.env){
+                that.filter.env = {
+                    attack : arg.filter.env.attack,
+                    frequency : arg.filter.env.frequency
+                }
             }
+            that.defaultFilter = that.filter
         }
-        that.defaultFilter = that.filter
+    }
+
+    var requestAudioFile = function(that){
+        var request = new XMLHttpRequest();
+        request.open("GET", that.source, true);
+        request.responseType = "arraybuffer";
+        request.onload = function() {
+            context.decodeAudioData(request.response, function (decodedBuffer){
+                that.decodedBuffer = decodedBuffer
+            })
+        }
+        request.send();
     }
 
     var constructVibrato = function(that, arg){
-        that.vibrato = {
-            shape : arg.vibrato.shape || 'sine',
-            speed : arg.vibrato.speed || 1,
-            magnitude : arg.vibrato.magnitude || 5,
-            attack : arg.vibrato.attack || 0
+        if (arg.vibrato){
+            that.vibrato = {
+                shape : arg.vibrato.shape || 'sine',
+                speed : arg.vibrato.speed || 1,
+                magnitude : arg.vibrato.magnitude || 5,
+                attack : arg.vibrato.attack || 0
+            }
         }
     }
 
     var constructTremolo = function(that, arg){
-        that.tremolo= {
-            shape : arg.tremolo.shape || 'sine',
-            speed : arg.tremolo.speed || 1,
-            magnitude : arg.tremolo.magnitude || 5,
-            attack : arg.tremolo.attack || 1
+        if (arg.tremolo){
+            that.tremolo= {
+                shape : arg.tremolo.shape || 'sine',
+                speed : arg.tremolo.speed || 1,
+                magnitude : arg.tremolo.magnitude || 5,
+                attack : arg.tremolo.attack || 1
+            }
         }
+    }
+
+    var setUpMic = function(that, arg){
+        navigator.getUserMedia({audio:true}, function(stream){
+            console.log(that)
+            that.nodes = []
+            that.mediaStreamSource = context.createMediaStreamSource(stream)
+            that.nodes.push(that.mediaStreamSource)
+            that.gain = context.createGain()
+            that.gain.gain.value = that.volume
+            that.nodes.push(that.gain)
+
+            if (that.filter){
+                that.filter.node = context.createBiquadFilter()
+                that.filter.node.type = that.filter.type
+                that.filter.node.frequency.value = that.filter.frequency
+                that.filter.node.Q.value = that.filter.q
+                that.nodes.push(that.filter.node)
+            }
+
+            if (that.reverb){
+                that.reverb.node = context.createConvolver()
+                that.reverb.node.buffer = Wad.reverb
+                that.reverb.gain = context.createGain()
+                that.reverb.gain.gain.value = that.reverb.wet
+
+                that.nodes.push(that.reverb.node)
+                that.nodes.push(that.reverb.gain)
+            }
+            that.nodes.push(context.destination)
+
+            plugEmIn(that.nodes)
+            
+        });
     }
 
 
@@ -85,18 +137,21 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         this.destination = arg.destination || context.destination // the last node the sound is routed to
         this.volume = arg.volume || 1 // peak volume. min:0, max:1 (actually max is infinite, but ...just keep it at or below 1)
         this.defaultVolume = this.volume
+
         if(arg.pitch && arg.pitch in Wad.pitches){
             this.pitch = Wad.pitches[arg.pitch]
         }
         else{
             this.pitch = arg.pitch || 440
         }
-        
+
         constructEnv(this, arg)
 
-        if (arg.filter){
-            constructFilter(this, arg)
-        }
+        constructFilter(this, arg)
+        
+        constructVibrato(this, arg)
+
+        constructTremolo(this, arg)
 
         if (arg.reverb){
             this.reverb = {
@@ -104,33 +159,17 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
             }
         }
 
-        if ('panning' in arg){
+        if (arg.panning){
             this.panning = {
                 location : arg.panning
             }
-        }
-
-        if (arg.vibrato){
-            constructVibrato(this, arg)
-        }
-        if (arg.tremolo){
-            constructTremolo(this, arg)
         }
 ////////////////////////////////
 
 
 /** If the source is not a pre-defined value, assume it is a URL for an audio file, and grab it now. **/
         if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
-            var request = new XMLHttpRequest();
-            request.open("GET", this.source, true);
-            request.responseType = "arraybuffer";
-            var that = this
-            request.onload = function() {
-                context.decodeAudioData(request.response, function (decodedBuffer){
-                    that.decodedBuffer = decodedBuffer
-                })
-            }
-            request.send();
+            requestAudioFile(this)
         }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -144,38 +183,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
 /** If the Wad's source is the microphone, the rest of the setup happens here. **/
         if(this.source === 'mic'){
-            var that = this
-            navigator.getUserMedia({audio:true}, function(stream){
-                console.log(that)
-                that.nodes = []
-                that.mediaStreamSource = context.createMediaStreamSource(stream)
-                that.nodes.push(that.mediaStreamSource)
-                that.gain = context.createGain()
-                that.gain.gain.value = that.volume
-                that.nodes.push(that.gain)
-
-                if (that.filter){
-                    that.filter.node = context.createBiquadFilter()
-                    that.filter.node.type = that.filter.type
-                    that.filter.node.frequency.value = that.filter.frequency
-                    that.filter.node.Q.value = that.filter.q
-                    that.nodes.push(that.filter.node)
-                }
-
-                if (that.reverb){
-                    that.reverb.node = context.createConvolver()
-                    that.reverb.node.buffer = Wad.reverb
-                    that.reverb.gain = context.createGain()
-                    that.reverb.gain.gain.value = that.reverb.wet
-
-                    that.nodes.push(that.reverb.node)
-                    that.nodes.push(that.reverb.gain)
-                }
-                that.nodes.push(context.destination)
-
-                plugEmIn(that.nodes)
-                
-            });
+            setUpMic(this, arg)
         }
 //////////////////////////////////////////////////////////////////////////////////        
 
