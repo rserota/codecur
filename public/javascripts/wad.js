@@ -167,13 +167,6 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 ////////////////////////////////
 
 
-/** If the source is not a pre-defined value, assume it is a URL for an audio file, and grab it now. **/
-        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
-            requestAudioFile(this)
-        }
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 /** If the Wad's source is noise, set the Wad's buffer to the noise buffer we created earlier. **/
         if(this.source === 'noise'){
             this.decodedBuffer = noiseBuffer
@@ -188,15 +181,12 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 //////////////////////////////////////////////////////////////////////////////////        
 
 
-
-
-
-
-
-
-
+/** If the source is not a pre-defined value, assume it is a URL for an audio file, and grab it now. **/
+        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
+            requestAudioFile(this)
+        }
+////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
-
 
 
 /** When a note is played, these two functions will schedule changes in volume and filter frequency,
@@ -229,9 +219,72 @@ with special handling for reverb (ConvolverNode). **/
     }
 /////////////////////////////////////////////////////////////////////////////////////////
 
+    var setUpOscillator = function(that, arg){
+        that.soundSource = context.createOscillator()
+        that.soundSource.type = that.source
+        if(arg && arg.pitch){
+            if(arg.pitch in Wad.pitches){
+                that.soundSource.frequency.value = Wad.pitches[arg.pitch]
+            }
+            else{
+                that.soundSource.frequency.value = arg.pitch
+            }
+        }
+        else {
+            that.soundSource.frequency.value = that.pitch
+        }
+    }
 
+    var setUpEnvOnPlay = function(that, arg){
+        if(arg && arg.env){
+            that.env.attack = arg.env.attack || that.defaultEnv.attack
+            that.env.decay = arg.env.decay || that.defaultEnv.decay
+            that.env.sustain = arg.env.sustain || that.defaultEnv.sustain
+            that.env.hold = arg.env.hold || that.defaultEnv.hold
+            that.env.release = arg.env.release || that.defaultEnv.release 
+        }
+        else{
+            that.env = that.defaultEnv
+        }
+    }
 
+    var setUpFilterOnPlay = function(that, arg){
+        if(arg && arg.filter && that.filter){
+            that.filter.node = context.createBiquadFilter()
+            that.filter.node.type = that.filter.type
+            that.filter.node.frequency.value = arg.filter.frequency || that.filter.frequency
+            that.filter.node.Q.value = arg.filter.q || that.filter.q
+            if (arg.filter.env){
+                that.filter.env = {
+                    attack : arg.filter.env.attack || that.defaultFilter.env.attack,
+                    frequency : arg.filter.env.frequency || that.defaultFilter.env.frequency
+                }
+            }
+            else if (that.defaultFilter.env){
+                that.filter.env = that.defaultFilter.env
+            }
+            that.nodes.push(that.filter.node)            
+        }
+        else if(that.filter){
+            if(that.defaultFilter.env){
+                that.filter.env = that.defaultFilter.env
+            }
+            that.filter.node = context.createBiquadFilter()
+            that.filter.node.type = that.filter.type
+            that.filter.node.frequency.value = that.filter.frequency
+            that.filter.node.Q.value = that.filter.q
+            that.nodes.push(that.filter.node)
+        }
+    }
 
+    var setUpReverbOnPlay = function(that, arg){
+        that.reverb.node = context.createConvolver()
+        that.reverb.node.buffer = Wad.reverb
+        that.reverb.gain = context.createGain()
+        that.reverb.gain.gain.value = that.reverb.wet
+        that.nodes.push(that.reverb.node)
+        that.nodes.push(that.reverb.gain)
+    }
 
 /** the play() method will create the various nodes that are required for this Wad to play,
 set properties on those nodes according to the constructor arguments and play() arguments,
@@ -241,21 +294,11 @@ then finally play the sound by calling playEnv() **/
         this.nodes = []
         if(arg && arg.volume){this.volume = arg.volume}
         else {this.volume = this.defaultVolume}
+
         if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
-            this.soundSource = context.createOscillator()
-            this.soundSource.type = this.source
-            if(arg && arg.pitch){
-                if(arg.pitch in Wad.pitches){
-                    this.soundSource.frequency.value = Wad.pitches[arg.pitch]
-                }
-                else{
-                    this.soundSource.frequency.value = arg.pitch
-                }
-            }
-            else {
-                this.soundSource.frequency.value = this.pitch
-            }
+            setUpOscillator(this, arg)
         }
+
         else{
             this.soundSource = context.createBufferSource();
             this.soundSource.buffer = this.decodedBuffer;
@@ -266,50 +309,16 @@ then finally play the sound by calling playEnv() **/
 
         this.nodes.push(this.soundSource)
 
+
 /**  sets the volume envelope based on the play() arguments if present,
 or defaults to the constructor arguments if the volume envelope is not set on play() **/
-
-        if(arg && arg.env){
-            this.env.attack = arg.env.attack || this.defaultEnv.attack
-            this.env.decay = arg.env.decay || this.defaultEnv.decay
-            this.env.sustain = arg.env.sustain || this.defaultEnv.sustain
-            this.env.hold = arg.env.hold || this.defaultEnv.hold
-            this.env.release = arg.env.release || this.defaultEnv.release 
-        }
-        else{
-            this.env = this.defaultEnv
-        }
+        setUpEnvOnPlay(this, arg)
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
 /**  sets up the filter and filter envelope based on the play() argument if present,
 or defaults to the constructor argument if the filter and filter envelope are not set on play() **/
-        if(arg && arg.filter && this.filter){
-            this.filter.node = context.createBiquadFilter()
-            this.filter.node.type = this.filter.type
-            this.filter.node.frequency.value = arg.filter.frequency || this.filter.frequency
-            this.filter.node.Q.value = arg.filter.q || this.filter.q
-            if (arg.filter.env){
-                this.filter.env = {
-                    attack : arg.filter.env.attack || this.defaultFilter.env.attack,
-                    frequency : arg.filter.env.frequency || this.defaultFilter.env.frequency
-                }
-            }
-            else if (this.defaultFilter.env){
-                this.filter.env = this.defaultFilter.env
-            }
-            this.nodes.push(this.filter.node)            
-        }
-        else if(this.filter){
-            if(this.defaultFilter.env){
-                this.filter.env = this.defaultFilter.env
-            }
-            this.filter.node = context.createBiquadFilter()
-            this.filter.node.type = this.filter.type
-            this.filter.node.frequency.value = this.filter.frequency
-            this.filter.node.Q.value = this.filter.q
-            this.nodes.push(this.filter.node)
-        }
+        setUpFilterOnPlay(this, arg)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -317,13 +326,7 @@ or defaults to the constructor argument if the filter and filter envelope are no
         this.nodes.push(this.gain)
 
         if (this.reverb){ // sets up reverb
-            this.reverb.node = context.createConvolver()
-            this.reverb.node.buffer = Wad.reverb
-            this.reverb.gain = context.createGain()
-            this.reverb.gain.gain.value = this.reverb.wet
-
-            this.nodes.push(this.reverb.node)
-            this.nodes.push(this.reverb.gain)
+            setUpReverbOnPlay(this, arg)
         }
 
 /**  sets panning based on the play() argument if present, or defaults to the constructor argument if panning is not set on play **/
