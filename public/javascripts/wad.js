@@ -34,6 +34,50 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
     request.send();
 ////////////////////////////////////////////////////////////////////////
 
+    var constructEnv = function(that, arg){   
+        this.env = { //default envelope, if one is not specified on play
+            attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
+            decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
+            sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
+            hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
+            release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
+        }
+        this.defaultEnv = this.env
+    }
+
+    var constructFilter = function(that, arg){   
+        that.filter = {
+            type : arg.filter.type,
+            frequency : arg.filter.frequency,
+            Q : arg.filter.q || 1
+        } 
+        if (arg.filter.env){
+            that.filter.env = {
+                attack : arg.filter.env.attack,
+                frequency : arg.filter.env.frequency
+            }
+        }
+        that.defaultFilter = that.filter
+    }
+
+    var constructVibrato = function(that, arg){
+        that.vibrato = {
+            shape : arg.vibrato.shape || 'sine',
+            speed : arg.vibrato.speed || 1,
+            magnitude : arg.vibrato.magnitude || 5,
+            attack : arg.vibrato.attack || 0
+        }
+    }
+
+    var constructTremolo = function(that, arg){
+        that.tremolo= {
+            shape : arg.tremolo.shape || 'sine',
+            speed : arg.tremolo.speed || 1,
+            magnitude : arg.tremolo.magnitude || 5,
+            attack : arg.tremolo.attack || 1
+        }
+    }
+
 
     var Wad = function(arg){
 /** Set basic Wad properties **/
@@ -47,28 +91,11 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         else{
             this.pitch = arg.pitch || 440
         }
-        this.env = { //default envelope, if one is not specified on play
-            attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
-            decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
-            sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
-            hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
-            release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
-        }
-        this.defaultEnv = this.env
+        
+        constructEnv(this, arg)
 
         if (arg.filter){
-            this.filter = {
-                type : arg.filter.type,
-                frequency : arg.filter.frequency,
-                Q : arg.filter.q || 1
-            } 
-            if (arg.filter.env){
-                this.filter.env = {
-                    attack : arg.filter.env.attack,
-                    frequency : arg.filter.env.frequency
-                }
-            }
-            this.defaultFilter = this.filter
+            constructFilter(this, arg)
         }
 
         if (arg.reverb){
@@ -84,20 +111,10 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         }
 
         if (arg.vibrato){
-            this.vibrato = {
-                shape : arg.vibrato.shape || 'sine',
-                speed : arg.vibrato.speed || 1,
-                magnitude : arg.vibrato.magnitude || 5,
-                attack : arg.vibrato.attack || 0
-            }
+            constructVibrato(this, arg)
         }
         if (arg.tremolo){
-            this.tremolo= {
-                shape : arg.tremolo.shape || 'sine',
-                speed : arg.tremolo.speed || 1,
-                magnitude : arg.tremolo.magnitude || 5,
-                attack : arg.tremolo.attack || 1
-            }
+            constructTremolo(this, arg)
         }
 ////////////////////////////////
 
@@ -163,188 +180,203 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 //////////////////////////////////////////////////////////////////////////////////        
 
 
-        this.setVolume = function(volume){
-            this.volume = volume;
-            if(this.gain){this.gain.gain.value = volume};
-        }
+
+
+
+
+
+
+
+    }
+
+
 
 /** When a note is played, these two functions will schedule changes in volume and filter frequency,
 as specified by the volume envelope and filter envelope **/
-        var filterEnv = function(wad){
-            wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.frequency, context.currentTime)
-            wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.env.frequency, context.currentTime+wad.filter.env.attack)
-        }
+    var filterEnv = function(wad){
+        wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.frequency, context.currentTime)
+        wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.env.frequency, context.currentTime+wad.filter.env.attack)
+    }
 
-        var playEnv = function(wad){
-            wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime)
-            wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack)
-            wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay)
-            wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
-            wad.soundSource.start(context.currentTime);
-            wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
-        }
+    var playEnv = function(wad){
+        wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime)
+        wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack)
+        wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay)
+        wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
+        wad.soundSource.start(context.currentTime);
+        wad.soundSource.stop(context.currentTime+wad.env.attack+wad.env.decay+wad.env.hold+wad.env.release)
+    }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 /** When all the nodes are set up for this Wad, this function plugs them into each other,
- with special handling for reverb (ConvolverNode). **/
-        var plugEmIn = function(nodes){
-            for (var i=1; i<nodes.length; i++){
-                nodes[i-1].connect(nodes[i])
-                if(nodes[i] instanceof ConvolverNode){
-                    nodes[i-1].connect(nodes[i+2])
-                }
+with special handling for reverb (ConvolverNode). **/
+    var plugEmIn = function(nodes){
+        for (var i=1; i<nodes.length; i++){
+            nodes[i-1].connect(nodes[i])
+            if(nodes[i] instanceof ConvolverNode){
+                nodes[i-1].connect(nodes[i+2])
             }
         }
+    }
 /////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
 /** the play() method will create the various nodes that are required for this Wad to play,
 set properties on those nodes according to the constructor arguments and play() arguments,
 plug the nodes into each other with plugEmIn(),
 then finally play the sound by calling playEnv() **/
-        this.play = function(arg){
-            this.nodes = []
-            if(arg && arg.volume){this.volume = arg.volume}
-            else {this.volume = this.defaultVolume}
-            if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
-                this.soundSource = context.createOscillator()
-                this.soundSource.type = this.source
-                if(arg && arg.pitch){
-                    if(arg.pitch in Wad.pitches){
-                        this.soundSource.frequency.value = Wad.pitches[arg.pitch]
-                    }
-                    else{
-                        this.soundSource.frequency.value = arg.pitch
-                    }
+    Wad.prototype.play = function(arg){
+        this.nodes = []
+        if(arg && arg.volume){this.volume = arg.volume}
+        else {this.volume = this.defaultVolume}
+        if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
+            this.soundSource = context.createOscillator()
+            this.soundSource.type = this.source
+            if(arg && arg.pitch){
+                if(arg.pitch in Wad.pitches){
+                    this.soundSource.frequency.value = Wad.pitches[arg.pitch]
                 }
-                else {
-                    this.soundSource.frequency.value = this.pitch
+                else{
+                    this.soundSource.frequency.value = arg.pitch
                 }
             }
-            else{
-                this.soundSource = context.createBufferSource();
-                this.soundSource.buffer = this.decodedBuffer;
-                if(this.source === 'noise'){
-                    this.soundSource.loop = true
-                }  
+            else {
+                this.soundSource.frequency.value = this.pitch
             }
+        }
+        else{
+            this.soundSource = context.createBufferSource();
+            this.soundSource.buffer = this.decodedBuffer;
+            if(this.source === 'noise'){
+                this.soundSource.loop = true
+            }  
+        }
 
-            this.nodes.push(this.soundSource)
+        this.nodes.push(this.soundSource)
 
 /**  sets the volume envelope based on the play() arguments if present,
 or defaults to the constructor arguments if the volume envelope is not set on play() **/
 
-            if(arg && arg.env){
-                this.env.attack = arg.env.attack || this.defaultEnv.attack
-                this.env.decay = arg.env.decay || this.defaultEnv.decay
-                this.env.sustain = arg.env.sustain || this.defaultEnv.sustain
-                this.env.hold = arg.env.hold || this.defaultEnv.hold
-                this.env.release = arg.env.release || this.defaultEnv.release 
-            }
-            else{
-                this.env = this.defaultEnv
-            }
+        if(arg && arg.env){
+            this.env.attack = arg.env.attack || this.defaultEnv.attack
+            this.env.decay = arg.env.decay || this.defaultEnv.decay
+            this.env.sustain = arg.env.sustain || this.defaultEnv.sustain
+            this.env.hold = arg.env.hold || this.defaultEnv.hold
+            this.env.release = arg.env.release || this.defaultEnv.release 
+        }
+        else{
+            this.env = this.defaultEnv
+        }
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
 /**  sets up the filter and filter envelope based on the play() argument if present,
 or defaults to the constructor argument if the filter and filter envelope are not set on play() **/
-            if(arg && arg.filter && this.filter){
-                this.filter.node = context.createBiquadFilter()
-                this.filter.node.type = this.filter.type
-                this.filter.node.frequency.value = arg.filter.frequency || this.filter.frequency
-                this.filter.node.Q.value = arg.filter.q || this.filter.q
-                if (arg.filter.env){
-                    this.filter.env = {
-                        attack : arg.filter.env.attack || this.defaultFilter.env.attack,
-                        frequency : arg.filter.env.frequency || this.defaultFilter.env.frequency
-                    }
+        if(arg && arg.filter && this.filter){
+            this.filter.node = context.createBiquadFilter()
+            this.filter.node.type = this.filter.type
+            this.filter.node.frequency.value = arg.filter.frequency || this.filter.frequency
+            this.filter.node.Q.value = arg.filter.q || this.filter.q
+            if (arg.filter.env){
+                this.filter.env = {
+                    attack : arg.filter.env.attack || this.defaultFilter.env.attack,
+                    frequency : arg.filter.env.frequency || this.defaultFilter.env.frequency
                 }
-                else if (this.defaultFilter.env){
-                    this.filter.env = this.defaultFilter.env
-                }
-                this.nodes.push(this.filter.node)            
             }
-            else if(this.filter){
-                if(this.defaultFilter.env){
-                    this.filter.env = this.defaultFilter.env
-                }
-                this.filter.node = context.createBiquadFilter()
-                this.filter.node.type = this.filter.type
-                this.filter.node.frequency.value = this.filter.frequency
-                this.filter.node.Q.value = this.filter.q
-                this.nodes.push(this.filter.node)
+            else if (this.defaultFilter.env){
+                this.filter.env = this.defaultFilter.env
             }
+            this.nodes.push(this.filter.node)            
+        }
+        else if(this.filter){
+            if(this.defaultFilter.env){
+                this.filter.env = this.defaultFilter.env
+            }
+            this.filter.node = context.createBiquadFilter()
+            this.filter.node.type = this.filter.type
+            this.filter.node.frequency.value = this.filter.frequency
+            this.filter.node.Q.value = this.filter.q
+            this.nodes.push(this.filter.node)
+        }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-            this.gain = context.createGain() // sets up the gain node
-            this.nodes.push(this.gain)
+        this.gain = context.createGain() // sets up the gain node
+        this.nodes.push(this.gain)
 
-            if (this.reverb){ // sets up reverb
-                this.reverb.node = context.createConvolver()
-                this.reverb.node.buffer = Wad.reverb
-                this.reverb.gain = context.createGain()
-                this.reverb.gain.gain.value = this.reverb.wet
+        if (this.reverb){ // sets up reverb
+            this.reverb.node = context.createConvolver()
+            this.reverb.node.buffer = Wad.reverb
+            this.reverb.gain = context.createGain()
+            this.reverb.gain.gain.value = this.reverb.wet
 
-                this.nodes.push(this.reverb.node)
-                this.nodes.push(this.reverb.gain)
-            }
+            this.nodes.push(this.reverb.node)
+            this.nodes.push(this.reverb.gain)
+        }
 
 /**  sets panning based on the play() argument if present, or defaults to the constructor argument if panning is not set on play **/
-            if ((arg && arg.panning) || this.panning){
-                this.panning.node = context.createPanner()
-                var panning = (arg && arg.panning) ? arg.panning : this.panning.location
-                this.panning.node.setPosition(panning, 0, 0)
-                this.nodes.push(this.panning.node)
-            }
+        if ((arg && arg.panning) || this.panning){
+            this.panning.node = context.createPanner()
+            var panning = (arg && arg.panning) ? arg.panning : this.panning.location
+            this.panning.node.setPosition(panning, 0, 0)
+            this.nodes.push(this.panning.node)
+        }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-            this.nodes.push(this.destination)
+        this.nodes.push(this.destination)
 
-            plugEmIn(this.nodes) 
-            if(this.filter && this.filter.env){filterEnv(this)}
-            playEnv(this)
+        plugEmIn(this.nodes) 
+        if(this.filter && this.filter.env){filterEnv(this)}
+        playEnv(this)
 
-            if (this.vibrato){ //sets up vibrato LFO
-                this.vibrato.wad = new Wad({
-                    source : this.vibrato.shape,
-                    pitch : this.vibrato.speed,
-                    volume : this.vibrato.magnitude,
-                    env : {
-                        attack : this.vibrato.attack
-                    },
-                    destination : this.soundSource.frequency
-                })
-                this.vibrato.wad.play()
-            }
-
-            if (this.tremolo){ //sets up tremolo LFO
-                this.tremolo.wad = new Wad({
-                    source : this.tremolo.shape,
-                    pitch : this.tremolo.speed,
-                    volume : this.tremolo.magnitude,
-                    env : {
-                        attack : this.tremolo.attack
-                    },
-                    destination : this.gain.gain
-                })
-                this.tremolo.wad.play()
-            }
+        if (this.vibrato){ //sets up vibrato LFO
+            this.vibrato.wad = new Wad({
+                source : this.vibrato.shape,
+                pitch : this.vibrato.speed,
+                volume : this.vibrato.magnitude,
+                env : {
+                    attack : this.vibrato.attack
+                },
+                destination : this.soundSource.frequency
+            })
+            this.vibrato.wad.play()
         }
+
+        if (this.tremolo){ //sets up tremolo LFO
+            this.tremolo.wad = new Wad({
+                source : this.tremolo.shape,
+                pitch : this.tremolo.speed,
+                volume : this.tremolo.magnitude,
+                env : {
+                    attack : this.tremolo.attack
+                },
+                destination : this.gain.gain
+            })
+            this.tremolo.wad.play()
+        }
+    }
 //////////////////////////////////////////////////////////////////////////////////////////
 
+
+    Wad.prototype.setVolume = function(volume){
+        this.volume = volume;
+        if(this.gain){this.gain.gain.value = volume};
+    }
+
+
 /** If multiple instances of a sound are playing simultaneously, stop() only can stop the most recent one **/
-        this.stop = function(){
-            if(!(this.source === 'mic')){
-                this.gain.gain.linearRampToValueAtTime(.0001, context.currentTime+this.env.release)
-                this.soundSource.stop(context.currentTime+this.env.release)             
-            }
-            else {
-                this.mediaStreamSource.disconnect(0)
-            }
+    Wad.prototype.stop = function(){
+        if(!(this.source === 'mic')){
+            this.gain.gain.linearRampToValueAtTime(.0001, context.currentTime+this.env.release)
+            this.soundSource.stop(context.currentTime+this.env.release)             
+        }
+        else {
+            this.mediaStreamSource.disconnect(0)
         }
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
