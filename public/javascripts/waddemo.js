@@ -4,10 +4,11 @@ var kick = new Wad({source : '/us/sendaudio/kick.mp3'})
 var bass = new Wad({
     source : 'sine',
     env : {
-        attack : .3,
+        attack : .1,
         decay : .1,
         sustain : .9,
-        hold : .2
+        hold : .1,
+        release : .1
     }
 })
 // var stereoBounce = setInterval(function(){
