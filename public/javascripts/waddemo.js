@@ -5,7 +5,9 @@ var bass = new Wad({
     source : 'sine',
     env : {
         attack : .3,
-        hold : 1
+        decay : .1,
+        sustain : .9
+        hold : .2
     }
 })
 // var stereoBounce = setInterval(function(){
