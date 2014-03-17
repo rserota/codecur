@@ -77,7 +77,7 @@ var oneLoop = function() {
 $(document).ready(function(){
     $('#go').on('click', function(){
         oneLoop();
-        setInterval(oneLoop, 16000);
+        setInterval(function(){oneLoop(), 16000});
     })
     
 })
