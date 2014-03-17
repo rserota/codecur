@@ -1,13 +1,13 @@
 var bloop = new Wad({source : 'sine', env : {hold : 1}, panning : 0})
-var kick = new Wad({source : 'www.codecur.io/us/sendaudio/kick.mp3'})
+var kick = new Wad({source : '/us/sendaudio/kick.mp3'})
 
-// var bass = new Wad({
-//     source : 'sine',
-//     env : {
-//         attack : .3,
-//         hold : 1
-//     }
-// })
+var bass = new Wad({
+    source : 'sine',
+    env : {
+        attack : .3,
+        hold : 1
+    }
+})
 // var stereoBounce = setInterval(function(){
 //     bloop.play({panning : 11})
 //     setTimeout(function(){
