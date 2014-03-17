@@ -32,7 +32,9 @@ var oneLoop = function() {
 }
 
 $(document).ready(function(){
-    oneLoop();
-    setInterval(oneLoop, 8000);
+    $('#go').on('click', function(){
+        oneLoop();
+        setInterval(oneLoop, 8000);
+    })
     
 })
