@@ -6,7 +6,7 @@ var bass = new Wad({
     env : {
         attack : .3,
         decay : .1,
-        sustain : .9
+        sustain : .9,
         hold : .2
     }
 })
