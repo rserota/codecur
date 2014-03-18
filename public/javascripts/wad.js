@@ -196,6 +196,7 @@ as specified by the volume envelope and filter envelope **/
     }
 
     var playEnv = function(wad, arg){
+        console.log('arg: ',arg)
         wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime + arg.wait)
         wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack + arg.wait)
         wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay + arg.wait)
