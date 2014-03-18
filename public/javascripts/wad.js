@@ -196,7 +196,7 @@ as specified by the volume envelope and filter envelope **/
     }
 
     var playEnv = function(wad, arg){
-        console.log('arg: ',arg)
+        console.log('arg: ',arg)//undefined
         wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime + arg.wait)
         wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack + arg.wait)
         wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay + arg.wait)
@@ -327,6 +327,8 @@ plug the nodes into each other with plugEmIn(),
 then finally play the sound by calling playEnv() **/
     Wad.prototype.play = function(arg){
         this.nodes = []
+        if(arg && !arg.wait){arg.wait = 0}
+        if(!arg){var arg = {wait: 0}}
         if(arg && arg.volume){this.volume = arg.volume}
         else {this.volume = this.defaultVolume}
 
