@@ -122,12 +122,26 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
                 that.nodes.push(that.reverb.node)
                 that.nodes.push(that.reverb.gain)
             }
+
+            if (that.panning){
+                that.panning.node = context.createPanner()
+                that.panning.node.setPosition(that.panning.location, 0, 0)
+                that.nodes.push(that.panning.node)
+            }
+
             that.nodes.push(context.destination)
 
             plugEmIn(that.nodes)
             
         });
     }
+
+        //     if ((arg && arg.panning) || that.panning){
+        //     that.panning.node = context.createPanner()
+        //     var panning = (arg && arg.panning) ? arg.panning : that.panning.location
+        //     that.panning.node.setPosition(panning, 0, 0)
+        //     that.nodes.push(that.panning.node)
+        // }
 
 
     var Wad = function(arg){
