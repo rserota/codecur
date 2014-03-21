@@ -62,7 +62,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         }
     }
 
-    var requestAudioFile = function(that){
+    var requestAudioFile = function(that, callback){
         var request = new XMLHttpRequest();
         request.open("GET", that.source, true);
         request.responseType = "arraybuffer";
@@ -70,6 +70,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         request.onload = function() {
             context.decodeAudioData(request.response, function (decodedBuffer){
                 that.decodedBuffer = decodedBuffer
+                if(callback){callback()}
                 that.playable = true
                 if (that.playOnLoad){that.play(that.playOnLoadArg)}
             })
@@ -348,7 +349,7 @@ then finally play the sound by calling playEnv() **/
             this.playOnLoad = true
             this.playOnLoadArg = arg
         }
-        
+
         else{
             this.nodes = []
             if(arg && !arg.wait){arg.wait = 0}
