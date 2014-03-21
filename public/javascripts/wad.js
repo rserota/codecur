@@ -348,65 +348,67 @@ then finally play the sound by calling playEnv() **/
             this.playOnLoad = true
             this.playOnLoadArg = arg
         }
-
-        this.nodes = []
-        if(arg && !arg.wait){arg.wait = 0}
-        if(!arg){var arg = {wait: 0}}
-        if(arg && arg.volume){this.volume = arg.volume}
-        else {this.volume = this.defaultVolume}
-
-        if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
-            setUpOscillator(this, arg)
-        }
-
+        
         else{
-            this.soundSource = context.createBufferSource();
-            this.soundSource.buffer = this.decodedBuffer;
-            if(this.source === 'noise'){
-                this.soundSource.loop = true
-            }  
-        }
+            this.nodes = []
+            if(arg && !arg.wait){arg.wait = 0}
+            if(!arg){var arg = {wait: 0}}
+            if(arg && arg.volume){this.volume = arg.volume}
+            else {this.volume = this.defaultVolume}
 
-        this.nodes.push(this.soundSource)
+            if(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0}){            
+                setUpOscillator(this, arg)
+            }
 
+            else{
+                this.soundSource = context.createBufferSource();
+                this.soundSource.buffer = this.decodedBuffer;
+                if(this.source === 'noise'){
+                    this.soundSource.loop = true
+                }  
+            }
 
-/**  sets the volume envelope based on the play() arguments if present,
-or defaults to the constructor arguments if the volume envelope is not set on play() **/
-        setUpEnvOnPlay(this, arg)
-////////////////////////////////////////////////////////////////////////////////////////
-
-
-/**  sets up the filter and filter envelope based on the play() argument if present,
-or defaults to the constructor argument if the filter and filter envelope are not set on play() **/
-        setUpFilterOnPlay(this, arg)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        this.gain = context.createGain() // sets up the gain node
-        this.nodes.push(this.gain)
-
-        if (this.reverb){ // sets up reverb
-            setUpReverbOnPlay(this, arg)
-        }
-
-/**  sets panning based on the play() argument if present, or defaults to the constructor argument if panning is not set on play **/
-        setUpPanningOnPlay(this, arg)
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            this.nodes.push(this.soundSource)
 
 
-        this.nodes.push(this.destination)
+    /**  sets the volume envelope based on the play() arguments if present,
+    or defaults to the constructor arguments if the volume envelope is not set on play() **/
+            setUpEnvOnPlay(this, arg)
+    ////////////////////////////////////////////////////////////////////////////////////////
 
-        plugEmIn(this.nodes) 
 
-        if(this.filter && this.filter.env){ filterEnv(this) }
-        playEnv(this, arg)
+    /**  sets up the filter and filter envelope based on the play() argument if present,
+    or defaults to the constructor argument if the filter and filter envelope are not set on play() **/
+            setUpFilterOnPlay(this, arg)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-        if (this.vibrato){ //sets up vibrato LFO
-            setUpVibratoOnPlay(this, arg)
-        }
 
-        if (this.tremolo){ //sets up tremolo LFO
-            setUpTremoloOnPlay(this, arg)
+            this.gain = context.createGain() // sets up the gain node
+            this.nodes.push(this.gain)
+
+            if (this.reverb){ // sets up reverb
+                setUpReverbOnPlay(this, arg)
+            }
+
+    /**  sets panning based on the play() argument if present, or defaults to the constructor argument if panning is not set on play **/
+            setUpPanningOnPlay(this, arg)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            this.nodes.push(this.destination)
+
+            plugEmIn(this.nodes) 
+
+            if(this.filter && this.filter.env){ filterEnv(this) }
+            playEnv(this, arg)
+
+            if (this.vibrato){ //sets up vibrato LFO
+                setUpVibratoOnPlay(this, arg)
+            }
+
+            if (this.tremolo){ //sets up tremolo LFO
+                setUpTremoloOnPlay(this, arg)
+            }
         }
     }
 //////////////////////////////////////////////////////////////////////////////////////////
