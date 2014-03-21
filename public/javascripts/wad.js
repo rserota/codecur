@@ -66,9 +66,12 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         var request = new XMLHttpRequest();
         request.open("GET", that.source, true);
         request.responseType = "arraybuffer";
+        that.playable = false
         request.onload = function() {
             context.decodeAudioData(request.response, function (decodedBuffer){
                 that.decodedBuffer = decodedBuffer
+                that.playable = true
+                if (that.playOnLoad){that.play(that.playOnLoadArg)}
             })
         }
         request.send();
@@ -340,6 +343,12 @@ set properties on those nodes according to the constructor arguments and play() 
 plug the nodes into each other with plugEmIn(),
 then finally play the sound by calling playEnv() **/
     Wad.prototype.play = function(arg){
+
+        if(this.playable === false){
+            this.playOnLoad = true
+            this.playOnLoadArg = arg
+        }
+
         this.nodes = []
         if(arg && !arg.wait){arg.wait = 0}
         if(!arg){var arg = {wait: 0}}
