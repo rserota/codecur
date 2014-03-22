@@ -1,21 +1,23 @@
 
-
 var Wad = (function(){
 
 /** Let's do the vendor-prefix dance. **/
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    context = new AudioContext();
+    var audioContext = window.AudioContext || window.webkitAudioContext;
+    var context = new audioContext();
     navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia
 /////////////////////////////////////////
 
 
 /** Pre-render a noise buffer instead of generating noise on the fly. **/
-    var bufferSize = 2 * context.sampleRate;
-    noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
-    output = noiseBuffer.getChannelData(0);
-    for (var i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-    }
+    var noiseBuffer = (function(){
+        var bufferSize = 2 * context.sampleRate;
+        var noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
+        var output = noiseBuffer.getChannelData(0);
+        for (var i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+        }
+        return noiseBuffer
+    })()
 /////////////////////////////////////////////////////////////////////////
 
 
@@ -23,16 +25,6 @@ var Wad = (function(){
 You may want to change this URL to serve files from your own server.
 Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
-    // var impulseURL = 'http://www.codecur.io/us/sendaudio/widehall.wav'
-    // var request = new XMLHttpRequest();
-    // request.open("GET", impulseURL, true);
-    // request.responseType = "arraybuffer";
-    // request.onload = function() {
-    //     context.decodeAudioData(request.response, function (decodedBuffer){
-    //         Wad.reverb = decodedBuffer
-    //     })
-    // }
-    // request.send();
 ////////////////////////////////////////////////////////////////////////
 
     var constructEnv = function(that, arg){   
@@ -120,27 +112,11 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
             if (that.reverb){
                 that.reverb.node = context.createConvolver()
+                that.reverb.node.buffer = that.reverb.buffer
                 that.reverb.gain = context.createGain()
                 that.reverb.gain.gain.value = that.reverb.wet
                 that.nodes.push(that.reverb.node)
                 that.nodes.push(that.reverb.gain)
-
-                var impulseURL = that.reverb.impulse || Wad.defaultImpulse
-                var request = new XMLHttpRequest();
-                request.open("GET", impulseURL, true);
-                request.responseType = "arraybuffer";
-                that.playable = false
-                request.onload = function() {
-                    context.decodeAudioData(request.response, function (decodedBuffer){
-                        that.reverb.node.buffer = decodedBuffer
-                        that.playable = true
-                        if (that.playOnLoad){that.play(that.playOnLoadArg)}
-
-                    })
-                }
-                request.send();
-
-
             }
 
             if (that.panning){
@@ -149,19 +125,9 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
                 that.nodes.push(that.panning.node)
             }
 
-            that.nodes.push(context.destination)
-
-            // plugEmIn(that.nodes)
-            
+            that.nodes.push(context.destination)            
         });
     }
-
-        //     if ((arg && arg.panning) || that.panning){
-        //     that.panning.node = context.createPanner()
-        //     var panning = (arg && arg.panning) ? arg.panning : that.panning.location
-        //     that.panning.node.setPosition(panning, 0, 0)
-        //     that.nodes.push(that.panning.node)
-        // }
 
 
     var Wad = function(arg){
@@ -171,17 +137,14 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         this.volume = arg.volume || 1 // peak volume. min:0, max:1 (actually max is infinite, but ...just keep it at or below 1)
         this.defaultVolume = this.volume
 
-        if(arg.pitch && arg.pitch in Wad.pitches){
-            this.pitch = Wad.pitches[arg.pitch]
-        }
-        else{
-            this.pitch = arg.pitch || 440
-        }
+        this.pitch = Wad.pitches[arg.pitch] || arg.pitch || 440
 
         constructEnv(this, arg)
 
         constructFilter(this, arg)
-        
+
+        //this.vibrato = constructVibrato(arg.vibrato)
+
         constructVibrato(this, arg)
 
         constructTremolo(this, arg)
@@ -189,13 +152,34 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         if (arg.reverb){
             this.reverb = {
                 wet : arg.reverb.wet || 1
+
             }
+
+            var impulseURL = arg.reverb.impulse || Wad.defaultImpulse
+            var request = new XMLHttpRequest();
+            request.open("GET", impulseURL, true);
+            request.responseType = "arraybuffer";
+            this.playable = false
+            var that = this
+            request.onload = function() {
+                context.decodeAudioData(request.response, function (decodedBuffer){
+                    that.reverb.buffer = decodedBuffer
+                    that.playable = true
+                    if (that.playOnLoad){that.play(that.playOnLoadArg)}
+
+                })
+            }
+            request.send();
         }
 
         if ('panning' in arg){
             this.panning = {
                 location : arg.panning
             }
+        }
+        
+        else {
+            this.panning = { location : 0 }
         }
 ////////////////////////////////
 
@@ -208,15 +192,15 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
 
 /** If the Wad's source is the microphone, the rest of the setup happens here. **/
-        if(this.source === 'mic'){
+        else if(this.source === 'mic'){
             setUpMic(this, arg)
         }
 //////////////////////////////////////////////////////////////////////////////////        
 
 
 /** If the source is not a pre-defined value, assume it is a URL for an audio file, and grab it now. **/
-        if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0, 'mic':0, 'noise':0})){
-            requestAudioFile(this)
+        else if(!(this.source in {'sine':0, 'sawtooth':0, 'square':0, 'triangle':0})){
+            requestAudioFile(this, arg.callback)
         }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
@@ -224,13 +208,12 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
 /** When a note is played, these two functions will schedule changes in volume and filter frequency,
 as specified by the volume envelope and filter envelope **/
-    var filterEnv = function(wad){
-        wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.frequency, context.currentTime)
-        wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.env.frequency, context.currentTime+wad.filter.env.attack)
+    var filterEnv = function(wad, arg){
+        wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.frequency, context.currentTime + arg.wait)
+        wad.filter.node.frequency.linearRampToValueAtTime(wad.filter.env.frequency, context.currentTime+wad.filter.env.attack + arg.wait)
     }
 
     var playEnv = function(wad, arg){
-        console.log('arg: ',arg)//undefined
         wad.gain.gain.linearRampToValueAtTime(0.0001, context.currentTime + arg.wait)
         wad.gain.gain.linearRampToValueAtTime(wad.volume, context.currentTime+wad.env.attack + arg.wait)
         wad.gain.gain.linearRampToValueAtTime(wad.volume*wad.env.sustain, context.currentTime+wad.env.attack+wad.env.decay + arg.wait)
@@ -312,8 +295,10 @@ with special handling for reverb (ConvolverNode). **/
     }
 
     var setUpReverbOnPlay = function(that, arg){
+
+
         that.reverb.node = context.createConvolver()
-        that.reverb.node.buffer = Wad.reverb
+        that.reverb.node.buffer = that.reverb.buffer
         that.reverb.gain = context.createGain()
         that.reverb.gain.gain.value = that.reverb.wet
         that.nodes.push(that.reverb.node)
@@ -460,7 +445,6 @@ then finally play the sound by calling playEnv() **/
     Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
 
 
-
 /** This object is a mapping of note names to frequencies. **/ 
     Wad.pitches = {
         'A0' :27.5000, 
@@ -598,3 +582,4 @@ then finally play the sound by calling playEnv() **/
     return Wad
     
 })()
+
