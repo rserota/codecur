@@ -443,7 +443,7 @@ then finally play the sound by calling playEnv() **/
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
+    // Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
 
 
 /** This object is a mapping of note names to frequencies. **/ 
