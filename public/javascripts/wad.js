@@ -362,7 +362,7 @@ with special handling for reverb (ConvolverNode). **/
             env : {
                 attack : that.lfo.attack
             },
-            destination : that.filter.node.Q
+            destination : that.filter.node.frequency
         })
         that.lfo.wad.play()
     }
