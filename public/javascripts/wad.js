@@ -22,7 +22,6 @@ var Wad = (function(){
 /** Grab the reverb impulse response file from a server.
 You may want to change this URL to serve files from your own server.
 Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
-    Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
 
     // var impulseURL = 'http://www.codecur.io/us/sendaudio/widehall.wav'
     // var request = new XMLHttpRequest();
@@ -457,6 +456,10 @@ then finally play the sound by calling playEnv() **/
         }
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
+
+
 
 /** This object is a mapping of note names to frequencies. **/ 
     Wad.pitches = {
