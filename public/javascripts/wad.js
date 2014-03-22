@@ -365,6 +365,7 @@ with special handling for reverb (ConvolverNode). **/
             destination : that.filter.node.frequency
         })
         that.lfo.wad.play()
+        console.log('hi')
     }
 
 /** the play() method will create the various nodes that are required for this Wad to play,
