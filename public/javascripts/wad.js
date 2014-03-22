@@ -125,7 +125,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
                 that.nodes.push(that.reverb.node)
                 that.nodes.push(that.reverb.gain)
 
-                var impulseURL = that.reverb.impulse || Wad.defaultReverb
+                var impulseURL = that.reverb.impulse || Wad.defaultImpulse
                 var request = new XMLHttpRequest();
                 request.open("GET", impulseURL, true);
                 request.responseType = "arraybuffer";
