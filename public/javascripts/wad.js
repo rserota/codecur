@@ -22,16 +22,18 @@ var Wad = (function(){
 /** Grab the reverb impulse response file from a server.
 You may want to change this URL to serve files from your own server.
 Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
-    var impulseURL = 'http://www.codecur.io/us/sendaudio/widehall.wav'
-    var request = new XMLHttpRequest();
-    request.open("GET", impulseURL, true);
-    request.responseType = "arraybuffer";
-    request.onload = function() {
-        context.decodeAudioData(request.response, function (decodedBuffer){
-            Wad.reverb = decodedBuffer
-        })
-    }
-    request.send();
+    Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
+
+    // var impulseURL = 'http://www.codecur.io/us/sendaudio/widehall.wav'
+    // var request = new XMLHttpRequest();
+    // request.open("GET", impulseURL, true);
+    // request.responseType = "arraybuffer";
+    // request.onload = function() {
+    //     context.decodeAudioData(request.response, function (decodedBuffer){
+    //         Wad.reverb = decodedBuffer
+    //     })
+    // }
+    // request.send();
 ////////////////////////////////////////////////////////////////////////
 
     var constructEnv = function(that, arg){   
@@ -119,12 +121,27 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
             if (that.reverb){
                 that.reverb.node = context.createConvolver()
-                that.reverb.node.buffer = Wad.reverb
                 that.reverb.gain = context.createGain()
                 that.reverb.gain.gain.value = that.reverb.wet
-
                 that.nodes.push(that.reverb.node)
                 that.nodes.push(that.reverb.gain)
+
+                var impulseURL = that.reverb.impulse || Wad.defaultReverb
+                var request = new XMLHttpRequest();
+                request.open("GET", impulseURL, true);
+                request.responseType = "arraybuffer";
+                that.playable = false
+                request.onload = function() {
+                    context.decodeAudioData(request.response, function (decodedBuffer){
+                        that.reverb.node.buffer = decodedBuffer
+                        that.playable = true
+                        if (that.playOnLoad){that.play(that.playOnLoadArg)}
+
+                    })
+                }
+                request.send();
+
+
             }
 
             if (that.panning){
