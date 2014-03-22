@@ -93,6 +93,17 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         }
     }
 
+    var constructLfo = function(that, arg){
+        if (arg.lfo){
+            that.lfo= {
+                shape : arg.lfo.shape || 'sine',
+                speed : arg.lfo.speed || 1,
+                magnitude : arg.lfo.magnitude || 5,
+                attack : arg.lfo.attack || 1
+            }
+        }
+    }
+
     var setUpMic = function(that, arg){
         navigator.getUserMedia({audio:true}, function(stream){
             that.nodes = []
@@ -149,6 +160,8 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         constructVibrato(this, arg)
 
         constructTremolo(this, arg)
+
+        constructLfo(this, arg)
 
         if (arg.reverb){
             this.reverb = {
@@ -341,6 +354,19 @@ with special handling for reverb (ConvolverNode). **/
         that.tremolo.wad.play()
     }
 
+    var setUpLfoOnPlay = function(that, arg){
+        that.lfo.wad = new Wad({
+            source : that.lfo.shape,
+            pitch : that.lfo.speed,
+            volume : that.lfo.magnitude,
+            env : {
+                attack : that.lfo.attack
+            },
+            destination : that.filter.node.Q
+        })
+        that.lfo.wad.play()
+    }
+
 /** the play() method will create the various nodes that are required for this Wad to play,
 set properties on those nodes according to the constructor arguments and play() arguments,
 plug the nodes into each other with plugEmIn(),
@@ -415,6 +441,10 @@ then finally play the sound by calling playEnv() **/
 
             if (this.tremolo){ //sets up tremolo LFO
                 setUpTremoloOnPlay(this, arg)
+            }
+
+            if (this.lfo && this.lfo.q){
+                setUpLfoOnPlay(this, arg)
             }
         }
     }
