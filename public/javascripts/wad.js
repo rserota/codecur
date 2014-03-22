@@ -443,7 +443,7 @@ then finally play the sound by calling playEnv() **/
                 setUpTremoloOnPlay(this, arg)
             }
 
-            if (this.lfo && this.lfo.q){
+            if (this.lfo){
                 setUpLfoOnPlay(this, arg)
             }
         }
