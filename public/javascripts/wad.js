@@ -323,7 +323,7 @@ with special handling for reverb (ConvolverNode). **/
             env : {
                 attack : that.vibrato.attack
             },
-            destination : that.soundSource.frequency
+            destination : arg.destination || that.soundSource.frequency
         })
         that.vibrato.wad.play()
     }
@@ -443,7 +443,7 @@ then finally play the sound by calling playEnv() **/
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
+    Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
 
 
 /** This object is a mapping of note names to frequencies. **/ 
