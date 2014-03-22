@@ -10,8 +10,8 @@ var Wad = (function(){
 
 
 /** Pre-render a noise buffer instead of generating noise on the fly. **/
-    var bufferSize = 2 * context.sampleRate,
-    noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate),
+    var bufferSize = 2 * context.sampleRate;
+    noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
     output = noiseBuffer.getChannelData(0);
     for (var i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1;
@@ -135,7 +135,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
             that.nodes.push(context.destination)
 
-            plugEmIn(that.nodes)
+            // plugEmIn(that.nodes)
             
         });
     }
@@ -348,6 +348,10 @@ then finally play the sound by calling playEnv() **/
         if(this.playable === false){
             this.playOnLoad = true
             this.playOnLoadArg = arg
+        }
+
+        else if(this.source === 'mic'){
+            plugEmIn(this.nodes)
         }
 
         else{
