@@ -1,5 +1,5 @@
 var bloop = new Wad({source : 'sine', env : {hold : 1}, panning : 0})
-var kick = new Wad({source : '/us/sendaudio/kick.mp3', reverb : {}})
+var kick = new Wad({source : '/us/sendaudio/kick.mp3', reverb : {source:'http://www.codecur.io/us/sendaudio/longhall.wav'}})
 kick.play()
 
 
