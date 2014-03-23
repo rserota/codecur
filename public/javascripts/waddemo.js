@@ -14,9 +14,10 @@ var bass = new Wad({
     }
 })
 
+
 var hat = new Wad(Wad.presets.highHatClosed)
 var snare = new Wad(Wad.presets.snare)
-
+Wad.setGlobalReverb({impulse : '/us/sendaudio/longhall.wav', wet : .5})
 snare.setVolume(9)
 // var stereoBounce = setInterval(function(){
 //     bloop.play({panning : 11})
@@ -111,7 +112,7 @@ var oneLoop = function() {
 $(document).ready(function(){
     $('#go').on('click', function(){
         oneLoop();
-        setInterval(oneLoop, Math.floor(beat * 16 * 1000));
+        // setInterval(oneLoop, Math.floor(beat * 16 * 1000));
     })
     
 })
