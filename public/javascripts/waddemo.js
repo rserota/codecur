@@ -1,5 +1,5 @@
 var bloop = new Wad({source : 'sine', env : {hold : 1}, panning : 0})
-var kick = new Wad({source : '/us/sendaudio/kick.mp3'})
+// var kick = new Wad({source : '/us/sendaudio/kick.mp3'})
 var bpm = 68
 var beat = 60 / bpm
 
@@ -9,10 +9,15 @@ var bass = new Wad({
         attack : .1,
         decay : .1,
         sustain : .9,
-        hold : .5,
+        hold : .4,
         release : .1
     }
 })
+
+var hat = new Wad(Wad.presets.highHatClosed)
+var snare = new Wad(Wad.presets.snare)
+
+snare.setVolume(9)
 // var stereoBounce = setInterval(function(){
 //     bloop.play({panning : 11})
 //     setTimeout(function(){
@@ -21,23 +26,53 @@ var bass = new Wad({
 // }, 1000)
 
 var oneLoop = function() {
+    hat.play({wait : beat * 0.5})
+    hat.play({wait : beat * 1.5})
+    hat.play({wait : beat * 2.5})
+    hat.play({wait : beat * 3.0})
+    hat.play({wait : beat * 4.5})
+    hat.play({wait : beat * 5.5})
+    hat.play({wait : beat * 6.5})
+    hat.play({wait : beat * 7.0})
 
-    kick.play({wait : beat*1})
-    // kick.play({wait : 01})
-    // kick.play({wait : 02})
-    // kick.play({wait : 03})
-    kick.play({wait : 04})
-    // kick.play({wait : 04.5})
-    // kick.play({wait : 06})
-    // kick.play({wait : 07})
-    kick.play({wait : 08})
-    kick.play({wait : 09})
-    // kick.play({wait : 10})
-    // kick.play({wait : 11})
-    kick.play({wait : 12})
-    // kick.play({wait : 13})
-    kick.play({wait : 14})
-    kick.play({wait : 15})
+    hat.play({wait : beat * (0.5 + 8)})
+    hat.play({wait : beat * (1.5 + 8)})
+    hat.play({wait : beat * (2.5 + 8)})
+    hat.play({wait : beat * (3.0 + 8)})
+    hat.play({wait : beat * (4.5 + 8)})
+    hat.play({wait : beat * (5.5 + 8)})
+    hat.play({wait : beat * (6.5 + 8)})
+    hat.play({wait : beat * (7.0 + 8)})
+
+    snare.play({wait : beat * 1})
+    snare.play({wait : beat * 2.25})
+    snare.play({wait : beat * 3})
+    snare.play({wait : beat * 5})
+    snare.play({wait : beat * 6.25})
+    snare.play({wait : beat * 7})
+
+    snare.play({wait : beat * (1 + 8)})
+    snare.play({wait : beat * (2.25 + 8)})
+    snare.play({wait : beat * (3 + 8)})
+    snare.play({wait : beat * (5 + 8)})
+    snare.play({wait : beat * (6.25 + 8)})
+    snare.play({wait : beat * (7 + 8)})
+
+
+    kick.play({wait : beat*0})
+    kick.play({wait : beat*2})
+    kick.play({wait : beat*4})
+    kick.play({wait : beat*4.5})
+    kick.play({wait : beat*6})
+    kick.play({wait : beat*7})
+    kick.play({wait : beat*7.5})
+    kick.play({wait : beat*(0+8)})
+    kick.play({wait : beat*(2+8)})
+    kick.play({wait : beat*(4+8)})
+    kick.play({wait : beat*(4.5+8)})
+    kick.play({wait : beat*(6+8)})
+    kick.play({wait : beat*(7+8)})
+    kick.play({wait : beat*(7.5+8)})
     bass.play({ pitch : 'C2',   wait : beat * 0})
     bass.play({ pitch : 'C3',   wait : beat * .5})
     bass.play({ pitch : 'C2',   wait : beat * 1})
@@ -76,7 +111,7 @@ var oneLoop = function() {
 $(document).ready(function(){
     $('#go').on('click', function(){
         oneLoop();
-        setInterval(oneLoop, 16000);
+        setInterval(oneLoop, Math.floor(beat * 16 * 1000));
     })
     
 })

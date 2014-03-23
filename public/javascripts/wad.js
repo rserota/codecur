@@ -424,7 +424,7 @@ then finally play the sound by calling playEnv() **/
 
 
     Wad.prototype.setVolume = function(volume){
-        this.volume = volume;
+        this.defaultVolume = volume;
         if(this.gain){this.gain.gain.value = volume};
     }
 
@@ -579,7 +579,8 @@ then finally play the sound by calling playEnv() **/
 
 
     Wad.presets = {
-        highHatClosed : {source : 'noise', env : { hold : .06}, filter : { type : 'highpass', frequency : 400}}
+        highHatClosed : {source : 'noise', env : { attack : .001, decay : .006, sustain : .2, hold : .001, release : .05}, filter : { type : 'highpass', frequency : 300}},
+        snare : {source:'noise', filter : {type : 'bandpass', frequency :450, q : 1}, env : {attack : .001, decay : .05, sustain : .1, hold : .0001, release : .1}, panning : -.01}
     }
 
     return Wad
