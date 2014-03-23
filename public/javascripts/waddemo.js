@@ -1,6 +1,7 @@
 var bloop = new Wad({source : 'sine', env : {hold : 1}, panning : 0})
 var kick = new Wad({source : '/us/sendaudio/kick.mp3'})
-
+var bpm = 68
+var beat = 60 / bpm
 
 var bass = new Wad({
     source : 'sine',
@@ -8,7 +9,7 @@ var bass = new Wad({
         attack : .1,
         decay : .1,
         sustain : .9,
-        hold : .1,
+        hold : .5,
         release : .1
     }
 })
@@ -21,7 +22,7 @@ var bass = new Wad({
 
 var oneLoop = function() {
 
-    kick.play({wait : 00})
+    kick.play({wait : beat*1})
     // kick.play({wait : 01})
     // kick.play({wait : 02})
     // kick.play({wait : 03})
@@ -37,38 +38,38 @@ var oneLoop = function() {
     // kick.play({wait : 13})
     kick.play({wait : 14})
     kick.play({wait : 15})
-    bass.play({ pitch : 'C2', wait : 0.0})
-    bass.play({ pitch : 'C3', wait : 0.5})
-    bass.play({ pitch : 'C2', wait : 1.0})
-    bass.play({ pitch : 'C3', wait : 1.5})
-    bass.play({ pitch : 'C2', wait : 2.0})
-    bass.play({ pitch : 'C3', wait : 2.5})
-    bass.play({ pitch : 'C2', wait : 3.0})
-    bass.play({ pitch : 'C3', wait : 3.5})
-    bass.play({ pitch : 'F2', wait : 4.0})
-    bass.play({ pitch : 'F3', wait : 4.5})
-    bass.play({ pitch : 'F2', wait : 5.0})
-    bass.play({ pitch : 'F3', wait : 5.5})
-    bass.play({ pitch : 'F2', wait : 6.0})
-    bass.play({ pitch : 'F3', wait : 6.5})
-    bass.play({ pitch : 'F2', wait : 7.0})
-    bass.play({ pitch : 'F3', wait : 7.5})
-    bass.play({ pitch : 'Ab2', wait : 8.0})
-    bass.play({ pitch : 'Ab3', wait : 8.5})
-    bass.play({ pitch : 'Ab2', wait : 9.0})
-    bass.play({ pitch : 'Ab3', wait : 9.5})
-    bass.play({ pitch : 'Ab2', wait : 10.0})
-    bass.play({ pitch : 'Ab3', wait : 10.5})
-    bass.play({ pitch : 'Ab2', wait : 11.0})
-    bass.play({ pitch : 'Ab3', wait : 11.5})
-    bass.play({ pitch : 'G2', wait : 12.0})
-    bass.play({ pitch : 'G3', wait : 12.5})
-    bass.play({ pitch : 'G2', wait : 13.0})
-    bass.play({ pitch : 'G3', wait : 13.5})
-    bass.play({ pitch : 'G2', wait : 14.0})
-    bass.play({ pitch : 'G3', wait : 14.5})
-    bass.play({ pitch : 'G2', wait : 15.0})
-    bass.play({ pitch : 'Bb2', wait : 15.5})
+    bass.play({ pitch : 'C2',  wait : beat * 1})
+    bass.play({ pitch : 'C3',  wait : beat * 2})
+    bass.play({ pitch : 'C2',  wait : beat * 3})
+    bass.play({ pitch : 'C3',  wait : beat * 4})
+    bass.play({ pitch : 'C2',  wait : beat * 5})
+    bass.play({ pitch : 'C3',  wait : beat * 6})
+    bass.play({ pitch : 'C2',  wait : beat * 7})
+    bass.play({ pitch : 'C3',  wait : beat * 8})
+    bass.play({ pitch : 'F2',  wait : beat * 9})
+    bass.play({ pitch : 'F3',  wait : beat * 10})
+    bass.play({ pitch : 'F2',  wait : beat * 11})
+    bass.play({ pitch : 'F3',  wait : beat * 12})
+    bass.play({ pitch : 'F2',  wait : beat * 13})
+    bass.play({ pitch : 'F3',  wait : beat * 14})
+    bass.play({ pitch : 'F2',  wait : beat * 15})
+    bass.play({ pitch : 'F3',  wait : beat * 16})
+    bass.play({ pitch : 'Ab2', wait : beat * 17})
+    bass.play({ pitch : 'Ab3', wait : beat * 18})
+    bass.play({ pitch : 'Ab2', wait : beat * 19})
+    bass.play({ pitch : 'Ab3', wait : beat * 20})
+    bass.play({ pitch : 'Ab2', wait : beat * 21})
+    bass.play({ pitch : 'Ab3', wait : beat * 22})
+    bass.play({ pitch : 'Ab2', wait : beat * 23})
+    bass.play({ pitch : 'Ab3', wait : beat * 24})
+    bass.play({ pitch : 'G2',  wait : beat * 25})
+    bass.play({ pitch : 'G3',  wait : beat * 26})
+    bass.play({ pitch : 'G2',  wait : beat * 27})
+    bass.play({ pitch : 'G3',  wait : beat * 28})
+    bass.play({ pitch : 'G2',  wait : beat * 29})
+    bass.play({ pitch : 'G3',  wait : beat * 30})
+    bass.play({ pitch : 'G2',  wait : beat * 31})
+    bass.play({ pitch : 'Bb2', wait : beat * 32})
 
 }
 
