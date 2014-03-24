@@ -5,6 +5,7 @@ var beat = 60 / bpm
 
 var bass = new Wad({
     source : 'sine',
+    volume : .9,
     env : {
         attack : .1,
         decay : .1,
@@ -17,7 +18,8 @@ var bass = new Wad({
 
 var hat = new Wad(Wad.presets.highHatClosed)
 var snare = new Wad(Wad.presets.snare)
-Wad.setGlobalReverb({impulse : '/us/sendaudio/longhall.wav', wet : .5})
+var hatOpen = new Wad(Wad.presets.highHatOpen)
+Wad.setGlobalReverb({impulse : '/us/sendaudio/longhall.wav', wet : .1})
 snare.setVolume(9)
 // var stereoBounce = setInterval(function(){
 //     bloop.play({panning : 11})
@@ -31,15 +33,19 @@ var oneLoop = function() {
     hat.play({wait : beat * 1.5})
     hat.play({wait : beat * 2.5})
     hat.play({wait : beat * 3.0})
+    hatOpen.play({wait : beat * 3.5, panning : .1})
     hat.play({wait : beat * 4.5})
     hat.play({wait : beat * 5.5})
     hat.play({wait : beat * 6.5})
     hat.play({wait : beat * 7.0})
+    hatOpen.play({wait : beat * 7.5, panning : -.1})
+
 
     hat.play({wait : beat * (0.5 + 8)})
     hat.play({wait : beat * (1.5 + 8)})
     hat.play({wait : beat * (2.5 + 8)})
     hat.play({wait : beat * (3.0 + 8)})
+    hatOpen.play({wait : beat * (3.5 + 8), panning : .1})
     hat.play({wait : beat * (4.5 + 8)})
     hat.play({wait : beat * (5.5 + 8)})
     hat.play({wait : beat * (6.5 + 8)})
@@ -63,16 +69,16 @@ var oneLoop = function() {
     kick.play({wait : beat*0})
     kick.play({wait : beat*2})
     kick.play({wait : beat*4})
-    kick.play({wait : beat*4.5})
+    // kick.play({wait : beat*4.5})
     kick.play({wait : beat*6})
-    kick.play({wait : beat*7})
-    kick.play({wait : beat*7.5})
+    // kick.play({wait : beat*7})
+    // kick.play({wait : beat*7.5})
     kick.play({wait : beat*(0+8)})
     kick.play({wait : beat*(2+8)})
     kick.play({wait : beat*(4+8)})
-    kick.play({wait : beat*(4.5+8)})
+    // kick.play({wait : beat*(4.5+8)})
     kick.play({wait : beat*(6+8)})
-    kick.play({wait : beat*(7+8)})
+    // kick.play({wait : beat*(7+8)})
     kick.play({wait : beat*(7.5+8)})
     bass.play({ pitch : 'C2',   wait : beat * 0})
     bass.play({ pitch : 'C3',   wait : beat * .5})
@@ -112,7 +118,7 @@ var oneLoop = function() {
 $(document).ready(function(){
     $('#go').on('click', function(){
         oneLoop();
-        // setInterval(oneLoop, Math.floor(beat * 16 * 1000));
+        setInterval(oneLoop, Math.floor(beat * 16 * 1000));
     })
     
 })
