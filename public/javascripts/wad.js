@@ -41,7 +41,13 @@ var Wad = (function(){
             hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
             release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
         }
-        that.defaultEnv = that.env
+        that.defaultEnv = {
+            attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
+            decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
+            sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
+            hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
+            release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
+        }
     }
 /////////////////////////////////////////
 
@@ -296,7 +302,13 @@ with special handling for reverb (ConvolverNode). **/
             that.env.release = arg.env.release || that.defaultEnv.release 
         }
         else{
-            that.env = that.defaultEnv
+            that.env = {
+                attack : that.defaultEnv.attack,
+                decay : that.defaultEnv.decay,
+                sustain : that.defaultEnv.sustain,
+                hold : that.defaultEnv.hold,
+                release : that.defaultEnv.release
+            }
         }
     }
 //////////////////////////////////////////////////////////////////////////////////
@@ -453,7 +465,7 @@ then finally play the sound by calling playEnv() **/
 
             plugEmIn(this) 
 
-            if(this.filter && this.filter.env){ filterEnv(this) }
+            if(this.filter && this.filter.env){ filterEnv(this, arg) }
             playEnv(this, arg)
 
             if (this.vibrato){ //sets up vibrato LFO
@@ -654,7 +666,7 @@ grab it from the defaultImpulse URL **/
     Wad.presets = {
         highHatClosed : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .03, release : .01}, filter : { type : 'highpass', frequency : 400, q : 1}},
         snare : {source : 'noise', env : {attack : .001, decay : .01, sustain : .2, hold : .03, release : .02}, filter : {type : 'bandpass', frequency : 300, q : .180}},
-        highHatOpen : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .43, release : .01}, filter : { type : 'highpass', frequency : 100, q : .2}}
+        highHatOpen : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .33, release : .12}, filter : { type : 'highpass', frequency : 100, q : .2}}
     }
 
     return Wad

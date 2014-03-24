@@ -7,13 +7,15 @@ var bass = new Wad({
     source : 'sine',
     volume : .9,
     env : {
-        attack : .1,
+        attack : .02,
         decay : .1,
         sustain : .9,
         hold : .4,
         release : .1
     }
 })
+
+var piano = new Wad({source : 'square', volume : 4.4, env : {attack : .01, decay : .005, sustain : .2, hold : .015, release : .3}, filter : {type : 'lowpass', frequency : 1200, q : 8.5, env : {attack : .2, frequency : 600}}})
 
 
 var hat = new Wad(Wad.presets.highHatClosed)
@@ -29,6 +31,7 @@ snare.setVolume(9)
 // }, 1000)
 
 var oneLoop = function() {
+
     hat.play({wait : beat * 0.5})
     hat.play({wait : beat * 1.5})
     hat.play({wait : beat * 2.5})
@@ -112,6 +115,27 @@ var oneLoop = function() {
     bass.play({ pitch : 'G3',  wait : beat * 14.5})
     bass.play({ pitch : 'G2',  wait : beat * 15})
     bass.play({ pitch : 'Bb2', wait : beat * 15.5})
+
+    piano.play( {pitch : 'C5', wait : beat * .75})
+    piano.play( {pitch : 'Eb5', wait : beat * 1, filter : { q : 15}})
+    piano.play( {pitch : 'C5', wait : beat * 1.5})
+    piano.play( {pitch : 'F5', wait : beat * 1.75, env : {release : .2}})
+
+    piano.play( {pitch : 'C5', wait : beat * 4.75})
+    piano.play( {pitch : 'Eb5', wait : beat * 5, filter : { q : 15}})
+    piano.play( {pitch : 'C5', wait : beat * 5.5})
+    piano.play( {pitch : 'F5', wait : beat * 5.75, env : {release : .2}})
+
+    piano.play( {pitch : 'C5', wait : beat * 8.75})
+    piano.play( {pitch : 'Eb5', wait : beat * 9, filter : { q : 15}})
+    piano.play( {pitch : 'C5', wait : beat * 9.5})
+    piano.play( {pitch : 'F5', wait : beat * 9.75, env : {release : .2}})
+
+    piano.play( {pitch : 'C5', wait : beat * 12.75})
+    piano.play( {pitch : 'Eb5', wait : beat * 13})
+    piano.play( {pitch : 'C5', wait : beat * 14.75})
+    piano.play( {pitch : 'Eb5', wait : beat * 15, filter : { q : 15}})
+    piano.play( {pitch : 'G5', wait : beat * 15.5, filter : { q : 15}})
 
 }
 
