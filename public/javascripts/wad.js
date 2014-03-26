@@ -666,9 +666,9 @@ grab it from the defaultImpulse URL **/
     Wad.presets = {
         highHatClosed : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .03, release : .01}, filter : { type : 'highpass', frequency : 400, q : 1}},
         snare : {source : 'noise', env : {attack : .001, decay : .01, sustain : .2, hold : .03, release : .02}, filter : {type : 'bandpass', frequency : 300, q : .180}},
-        highHatOpen : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .33, release : .12}, filter : { type : 'highpass', frequency : 100, q : .2}}
+        highHatOpen : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .43, release : .01}, filter : { type : 'highpass', frequency : 100, q : .2}},
+        ghost : {source : 'square', volume : .2, env : {attack : .05, decay : .3, sustain : .5, hold : 2.5, release : .5}, filter : {type : 'lowpass', frequency : 600, q : 7, env : { attack : .7, frequency : 1600}}, vibrato : {attack : 8, speed : 10, magnitude : 150 }}
     }
-
     return Wad
     
 })()

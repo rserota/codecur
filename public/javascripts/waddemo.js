@@ -132,9 +132,9 @@ var oneLoop = function() {
     piano.play( {pitch : 'F5', wait : beat * 9.75, env : {release : .2}})
 
     piano.play( {pitch : 'C5', wait : beat * 12.75})
-    piano.play( {pitch : 'Eb5', wait : beat * 13})
+    piano.play( {pitch : 'Eb5', wait : beat * 13, filter : { q : 15}})
     piano.play( {pitch : 'C5', wait : beat * 14.75})
-    piano.play( {pitch : 'Eb5', wait : beat * 15, filter : { q : 15}})
+    piano.play( {pitch : 'Eb5', wait : beat * 15})
     piano.play( {pitch : 'G5', wait : beat * 15.5, filter : { q : 15}})
 
 }
