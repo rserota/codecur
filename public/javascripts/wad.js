@@ -38,14 +38,14 @@ var Wad = (function(){
             attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
             decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
             sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
-            hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
+            hold : arg.env ? (arg.env.hold || 4) : 4, // time in seconds to maintain sustain volume
             release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
         }
         that.defaultEnv = {
             attack : arg.env ? (arg.env.attack || 0) : 0, // time in seconds from onset to peak volume
             decay : arg.env ? (arg.env.decay || 0) : 0, // time in seconds from peak volume to sustain volume
             sustain : arg.env ? (arg.env.sustain || 1) : 1, // sustain volume level, as a percent of peak volume. min:0, max:1
-            hold : arg.env ? (arg.env.hold || 9001) : 9001, // time in seconds to maintain sustain volume
+            hold : arg.env ? (arg.env.hold || 4) : 4, // time in seconds to maintain sustain volume
             release : arg.env ? (arg.env.release || 0) : 0 // time in seconds from sustain volume to zero volume
         }
     }
@@ -195,6 +195,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         this.defaultVolume = this.volume
         this.playable = 1 // if this is less than 1, this Wad is still waiting for a file to download before it can play
         this.pitch = Wad.pitches[arg.pitch] || arg.pitch || 440
+        this.globalReverb = arg.globalReverb || false
 
         constructEnv(this, arg)
         constructFilter(this, arg)
@@ -203,12 +204,17 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         constructReverb(this, arg)
 
         if ('panning' in arg){
-            this.panning = {
-                location : arg.panning
+            if (typeof(arg.panning) === "number"){
+                this.panning = { location : [ arg.panning, 0, 0 ] }
+            }
+
+            else {
+                this.panning = { location : [ arg.panning[0], arg.panning[1], arg.panning[2] ] }
             }
         }
+
         else {
-            this.panning = { location : 0 }
+            this.panning = { location : [0, 0, 0] }
         }
 ////////////////////////////////
 
@@ -264,7 +270,7 @@ with special handling for reverb (ConvolverNode). **/
         }
 
         that.nodes[that.nodes.length-1].connect(that.destination)
-        if (Wad.reverb){
+        if (Wad.reverb && that.globalReverb){
             that.nodes[that.nodes.length-1].connect(Wad.reverb.node)
             Wad.reverb.node.connect(Wad.reverb.gain)
             Wad.reverb.gain.connect(that.destination)
@@ -362,8 +368,19 @@ with special handling for reverb (ConvolverNode). **/
     var setUpPanningOnPlay = function(that, arg){
         if ((arg && arg.panning) || that.panning){
             that.panning.node = context.createPanner()
-            var panning = (arg && arg.panning) ? arg.panning : that.panning.location
-            that.panning.node.setPosition(panning, 0, 0)
+            // var panning = (arg && arg.panning) ? arg.panning : that.panning.location
+            if (arg && arg.panning){
+                if (typeof(arg.panning) === 'number'){
+                    var panning = [arg.panning, 0, 0]
+                }
+                else {
+                    var panning = [arg.panning[0], arg.panning[1], arg.panning[2]]
+                }
+            }
+            else {
+                var panning = [0, 0, 0]
+            }
+            that.panning.node.setPosition(panning[0], panning[1], panning[2] )
             that.nodes.push(that.panning.node)
         }
     }
@@ -490,7 +507,13 @@ then finally play the sound by calling playEnv() **/
 
 /** Change the panning of a Wad at any time, including during playback **/
     Wad.prototype.setPanning = function(panning){
-        this.panning.node.setPosition(panning, 0, 0)
+        if (typeof(panning) === 'number'){
+            this.panning.node.setPosition(panning, this.panning.location[1], this.panning.location[2])
+        }
+
+        else {
+            this.panning.node.setPosition(panning[0], panning[1], panning[2])
+        }
     }
 //////////////////////////////////////////////////////////////////////////
 
@@ -499,7 +522,7 @@ then finally play the sound by calling playEnv() **/
     Wad.prototype.stop = function(){
         if(!(this.source === 'mic')){
             this.gain.gain.linearRampToValueAtTime(.0001, context.currentTime+this.env.release)
-            this.soundSource.stop(context.currentTime+this.env.release)             
+            // this.soundSource.stop(context.currentTime+this.env.release)             
         }
         else {
             this.mediaStreamSource.disconnect(0)
@@ -667,7 +690,8 @@ grab it from the defaultImpulse URL **/
         highHatClosed : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .03, release : .01}, filter : { type : 'highpass', frequency : 400, q : 1}},
         snare : {source : 'noise', env : {attack : .001, decay : .01, sustain : .2, hold : .03, release : .02}, filter : {type : 'bandpass', frequency : 300, q : .180}},
         highHatOpen : {source : 'noise', env : { attack : .001, decay : .008, sustain : .2, hold : .43, release : .01}, filter : { type : 'highpass', frequency : 100, q : .2}},
-        ghost : {source : 'square', volume : .2, env : {attack : .05, decay : .3, sustain : .5, hold : 2.5, release : .5}, filter : {type : 'lowpass', frequency : 600, q : 7, env : { attack : .7, frequency : 1600}}, vibrato : {attack : 8, speed : 10, magnitude : 150 }}
+        ghost : {source : 'square', volume : .3, env : {attack : .01, decay : .002, sustain : .5, hold : 2.5, release : .3}, filter : {type : 'lowpass', frequency : 600, q : 7, env : { attack : .7, frequency : 1600}}, vibrato : {attack : 8, speed : 8, magnitude : 100 }},
+        piano : {source : 'square', volume : 1.4, env : {attack : .01, decay : .005, sustain : .2, hold : .015, release : .3}, filter : {type : 'lowpass', frequency : 1200, q : 8.5, env : {attack : .2, frequency : 600}}}
     }
     return Wad
     
