@@ -433,7 +433,7 @@ then finally play the sound by calling playEnv() **/
         }
 
         else if(this.source === 'mic'){
-            plugEmIn(this.nodes)
+            plugEmIn(this)
         }
 
         else{
