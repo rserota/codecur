@@ -182,7 +182,6 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
                 that.nodes.push(that.panning.node)
             }
 
-            that.nodes.push(context.destination)            
         });
     }
 ////////////////////////////////////////////////////////////////////
