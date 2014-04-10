@@ -72,6 +72,10 @@ module.exports = {
         response.render('audiotest')
     },
 
+    songDemo : function(request, response){
+        response.render('songdemo')
+    },
+
     sendAudio : function(request, response){
         console.log('params',request.params.file)
         response.sendfile(require('path').resolve(__dirname + "/../public/media/sounds/" + request.params.file),function(error){

@@ -177,6 +177,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
             if (that.panning){
                 that.panning.node = context.createPanner()
+
                 that.panning.node.setPosition(that.panning.location[0], that.panning.location[1], that.panning.location[2])
                 that.nodes.push(that.panning.node)
             }
@@ -196,6 +197,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
         this.playable = 1 // if this is less than 1, this Wad is still waiting for a file to download before it can play
         this.pitch = Wad.pitches[arg.pitch] || arg.pitch || 440
         this.globalReverb = arg.globalReverb || false
+
 
         constructEnv(this, arg)
         constructFilter(this, arg)
@@ -515,6 +517,7 @@ then finally play the sound by calling playEnv() **/
             this.panning.node.setPosition(panning[0], panning[1], panning[2])
         }
     }
+    
 //////////////////////////////////////////////////////////////////////////
 
 
