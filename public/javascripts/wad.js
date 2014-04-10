@@ -177,7 +177,7 @@ Check out http://www.voxengo.com/impulses/ for free impulse responses. **/
 
             if (that.panning){
                 that.panning.node = context.createPanner()
-                that.panning.node.setPosition([ that.panning.location[0], that.panning.location[1], that.panning.location[2] ])
+                that.panning.node.setPosition(that.panning.location[0], that.panning.location[1], that.panning.location[2])
                 that.nodes.push(that.panning.node)
             }
 
