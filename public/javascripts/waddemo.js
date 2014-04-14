@@ -20,11 +20,11 @@ var bass = new Wad({
 var piano = new Wad({source : 'square', volume : 1.4, env : {attack : .01, decay : .005, sustain : .2, hold : .015, release : .3}, filter : {type : 'lowpass', frequency : 1200, q : 8.5, env : {attack : .2, frequency : 600}}})
 piano.globalReverb = true
 
-var hat = new Wad(Wad.presets.highHatClosed)
+var hat = new Wad(Wad.presets.hiHatClosed)
 hat.globalReverb = true
 var snare = new Wad(Wad.presets.snare)
 snare.globalReverb = true
-var hatOpen = new Wad(Wad.presets.highHatOpen)
+var hatOpen = new Wad(Wad.presets.hiHatOpen)
 hatOpen.globalReverb = true
 var ghost = new Wad(Wad.presets.ghost)
 Wad.setGlobalReverb({impulse : '/us/sendaudio/longhall.wav', wet : .5})
@@ -42,12 +42,12 @@ var oneLoop = function() {
     hat.play({wait : beat * 1.5})
     hat.play({wait : beat * 2.5})
     hat.play({wait : beat * 3.0})
-    hatOpen.play({wait : beat * 3.5, panning : [1, 1, 1]})
+    hatOpen.play({wait : beat * 3.5, panning : .1})
     hat.play({wait : beat * 4.5})
     hat.play({wait : beat * 5.5})
     hat.play({wait : beat * 6.5})
     hat.play({wait : beat * 7.0})
-    hatOpen.play({wait : beat * 7.5, panning : [-1, -1, -1]})
+    hatOpen.play({wait : beat * 7.5, panning : -.1})
 
 
     hat.play({wait : beat * (0.5 + 8)})

@@ -1,21 +1,197 @@
+doctype html
+html
+    head
+        title Wad Demo
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        link(rel="shortcut icon", href="../media/images/favicon.ico")
+        link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/stylesheets/global.css')
+        link(href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", rel="stylesheet")
+
+    body
+        .instrument-nav
+            ul
+                li.btn.btn-default.toggle#kick Kick 
+                li.btn.btn-default.toggle#bass Bass
+                li.btn.btn-default.toggle#snare Snare
+                li.btn.btn-default.toggle#hihats Hihats
+                li.btn.btn-default.toggle#flute Flute
+                li.btn.btn-default.toggle#piano Piano
+                li.btn.btn-success#play Play!
+        .container
+            .space
+            .space  
+            .row
+                .col-sm-12
+                    h1.text-center Wad.js Demo Song
+            .space
+            .row
+                .col-sm-12
+                    p.p-text Wad is a Javascript library for manipulating audio using the new HTML5 Web Audio API. It greatly simplifies the process of creating, playing, and manipulating audio, either for real-time playback, or at scheduled intervals. 
+                    p.p-text Press the "Play!" button to start playing a demo song <em>with all the instruments muted</em>.
+
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title
+                        i.fa.fa-plus-circle
+                        a(data-toggle="collapse",data-parent=".accordion",href="#collapse1") Kick Drum
+                .panel-collapse.collapse#collapse1
+                    .panel-body.p-text
+                        p.p-text The kick drum in this song is just an audio file. Use a URL to an audio file as the source, and then call <code>play()</code> with no arguments. It doesn't get much simpler than this. 
+                        pre
+                            code 
+                                | var kick = new Wad({ source : 'http://www.myServer.com/kick.wav' })
+                                | 
+                                | kick.play()
+
+            .space
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title
+                        i.fa.fa-plus-circle
+                        a(data-toggle="collapse",data-parent=".accordion",href="#collapse2") Bass
+                .panel-collapse.collapse#collapse2
+                    .panel-body.p-text
+                        p.p-text The bass in this song is synthesized with a sine wave. Specify a wave shape as the source, and set the envelope to control the loudness of the sound as it plays. If you've used other audio synthesis software, these parameters should look familiar to you. To play specific notes, pass in the name of a note as a pitch parameter. 
+                        pre
+                            code
+                                | var bass = new Wad({
+                                |     source : 'sine',
+                                |     env : {
+                                |         attack : .02,
+                                |         decay : .1,
+                                |         sustain : .9,
+                                |         hold : .4,
+                                |         release : .1
+                                |     }
+                                | })
+                                | 
+                                | bass.play({ pitch : 'C2' })
 
 
-pre
-    code
-        | var dogBarkingBuffer = null
-        | // Fix up prefixing
-        | window.AudioContext = window.AudioContext || window.webkitAudioContext
-        | var context = new AudioContext()
-        | function loadDogSound(url) {
-        |   var request = new XMLHttpRequest()
-        |   request.open('GET', url, true)
-        |   request.responseType = 'arraybuffer'
-        |   // Decode asynchronously
-        |   request.onload = function() {
-        |     context.decodeAudioData(request.response, function(buffer) {
-        |       dogBarkingBuffer = buffer
-        |     }, onError)
-        |   }
-        |   request.send()
-        | }
-        
+
+
+
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title
+                        i.fa.fa-plus-circle
+                        a(data-toggle="collapse",data-parent=".accordion",href="#collapse3") Snare Drum
+                .panel-collapse.collapse#collapse3
+                    .panel-body.p-text
+                        p.p-text The snare drum in this song is synthesized using filtered noise. In this example, a band-pass filter is removing the noise above and below 300 hertz.  
+                        pre
+                            code
+                                | var snare = new Wad ({
+                                |    source : 'noise', 
+                                |     env : {
+                                |         attack : .001, 
+                                |         decay : .01, 
+                                |         sustain : .2, 
+                                |         hold : .03, 
+                                |         release : .02
+                                |     }, 
+                                |     filter : {
+                                |         type : 'bandpass', 
+                                |         frequency : 300, 
+                                |         q : .180
+                                |     }
+                                | })
+
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title
+                        i.fa.fa-plus-circle
+                        a(data-toggle="collapse",data-parent=".accordion",href="#collapse4") Hi-hats
+                .panel-collapse.collapse#collapse4
+                    .panel-body.p-text
+                        p.p-text The hi-hats in this song are synthesized using similar parameters as the snare drum. Rather than specifying the values manually, you can simply use a preset.
+                        pre
+                            code
+                                | var hatClosed = new Wad( Wad.presets.hiHatClosed )
+                                | 
+                                | hatClosed.play()
+
+             .panel.panel-default
+                .panel-heading
+                    h4.panel-title
+                        i.fa.fa-plus-circle
+                        a(data-toggle="collapse",data-parent=".accordion",href="#collapse5") Flute
+                .panel-collapse.collapse#collapse5
+                    .panel-body.p-text
+                        p.p-text The flute-like synth in this song is synthesized using a square wave. It uses vibrato to make that eerie, wavering sound. It is panned to either side by passing a panning parameter to the <code>play()</code> method.
+                        pre
+                            code
+                                | var flute = new Wad({
+                                |     source : 'square', 
+                                |     env : {
+                                |         attack : .01, 
+                                |         decay : .002, 
+                                |         sustain : .5, 
+                                |         hold : 2.5, 
+                                |         release : .3
+                                |     }, 
+                                |     filter : {
+                                |         type : 'lowpass', 
+                                |         frequency : 600, 
+                                |         q : 7, 
+                                |         env : { 
+                                |             attack : .7, 
+                                |             frequency : 1600
+                                |         }
+                                |     }, 
+                                |     vibrato : {
+                                |         attack : 8, 
+                                |         speed : 8, 
+                                |         magnitude : 100 
+                                |     }
+                                | })
+                                | 
+                                | flute.play({ panning :  .1, pitch : 'F5'  })
+                                | flute.play({ panning : -.1, pitch : 'Ab5' })
+       
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title
+                        i.fa.fa-plus-circle
+                        a(data-toggle="collapse",data-parent=".accordion",href="#collapse6") Piano
+                .panel-collapse.collapse#collapse6
+                    .panel-body.p-text
+                        p.p-text The piano-like synth in this song is synthesized using a square wave, similarly to how the flute was synthesized. The real fun happens in the parameters to the <code>play()</code> method. Several paremeters are changed for each individual note to make a more dynamic, expressive melody. 
+                        pre
+                            code
+                                | var piano = new Wad({
+                                |     source : 'square', 
+                                |     env : {
+                                |         attack : .01, 
+                                |         decay : .005, 
+                                |         sustain : .2, 
+                                |         hold : .015, 
+                                |         release : .3
+                                |     }, 
+                                |     filter : {
+                                |         type : 'lowpass', 
+                                |         frequency : 1200, 
+                                |         q : 8.5, 
+                                |         env : {
+                                |             attack : .2, 
+                                |             frequency : 600
+                                |         }
+                                |     }
+                                | })
+                                | 
+                                | piano.play({ pitch : 'C5' })
+                                | piano.play({ pitch : 'Eb5', filter : { q : 15 } })
+                                | piano.play({ pitch : 'F5', env : { release : .2 } })
+
+
+
+    
+
+
+        script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
+        script(src='http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js')
+        script(src="/javascripts/wad.js")
+        script(src="/javascripts/songdemo.js")
+
+

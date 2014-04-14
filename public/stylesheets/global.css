@@ -1,0 +1,31 @@
+.space {
+    height: 50px;
+}
+
+.instrument-nav {
+    position: fixed;
+    background-color:white;
+    z-index:10;
+    width:100%;
+}
+.instrument-nav li {
+    height: 40px;
+    width: 100px;
+    display: inline-block;
+    margin: 10px;
+    transition: all .3s;
+}
+
+.toggle:hover {
+    background-color: lightsteelblue;
+}
+
+.toggle.on:hover {
+    color: aliceblue;
+    background-color: cornflowerblue;
+}
+
+.on {
+    color: aliceblue;
+    background-color: dodgerblue;
+}
