@@ -1,0 +1,21 @@
+.row
+    .col-sm-1
+    .col-sm-10
+        h2.text-center Bass
+        .space
+        p.p-text The bass in this song is synthesized with a sine wave. Specify a wave shape as the source, and set the envelope to control the loudness of the sound as it plays. If you've used other audio synthesis software, <a href="http://en.wikipedia.org/wiki/Synthesizer#ADSR_envelope">these parameters</a> should look familiar to you. To play specific notes, pass in the name of a note as a pitch parameter. 
+        .space
+        pre
+            code
+                | var bass = new Wad({
+                |     source : 'sine',
+                |     env : {
+                |         attack : .02,
+                |         decay : .1,
+                |         sustain : .9,
+                |         hold : .4,
+                |         release : .1
+                |     }
+                | })
+                | 
+                | bass.play({ pitch : 'C2' })

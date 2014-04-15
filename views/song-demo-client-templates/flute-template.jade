@@ -1,0 +1,36 @@
+.row
+    .col-sm-1
+    .col-sm-10
+        h2.text-center Flute
+        .space
+        p.p-text The flute-like synth in this song is synthesized using a square wave. It uses vibrato to make that eerie, wavering sound. It is panned to either side by passing a panning parameter to the <code>play()</code> method.
+        .space
+        pre
+            code
+                | var flute = new Wad({
+                |     source : 'square', 
+                |     env : {
+                |         attack : .01, 
+                |         decay : .002, 
+                |         sustain : .5, 
+                |         hold : 2.5, 
+                |         release : .3
+                |     }, 
+                |     filter : {
+                |         type : 'lowpass', 
+                |         frequency : 600, 
+                |         q : 7, 
+                |         env : { 
+                |             attack : .7, 
+                |             frequency : 1600
+                |         }
+                |     }, 
+                |     vibrato : {
+                |         attack : 8, 
+                |         speed : 8, 
+                |         magnitude : 100 
+                |     }
+                | })
+                | 
+                | flute.play({ panning :  .1, pitch : 'F5'  })
+                | flute.play({ panning : -.1, pitch : 'Ab5' })

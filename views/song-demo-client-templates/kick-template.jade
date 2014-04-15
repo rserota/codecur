@@ -1,0 +1,12 @@
+.row
+    .col-sm-1
+    .col-sm-10
+        h2.text-center Kick Drum
+        .space
+        p.p-text The kick drum in this song is just an audio file. Use a URL to an audio file as the source, and then call <code>play()</code> with no arguments. It doesn't get much simpler than this. 
+        .space
+        pre
+            code 
+                | var kick = new Wad({ source : 'http://www.myServer.com/kick.wav' })
+                | 
+                | kick.play()

@@ -1,0 +1,32 @@
+.row
+    .col-sm-1
+    .col-sm-10
+        h2.text-center Piano
+        .space
+        p.p-text The piano-like synth in this song is synthesized using a square wave, similarly to how the flute was synthesized. The real fun happens in the parameters to the <code>play()</code> method. Several paremeters are changed for each individual note to make a more dynamic, expressive melody. 
+        .space
+        pre
+            code
+                | var piano = new Wad({
+                |     source : 'square', 
+                |     env : {
+                |         attack : .01, 
+                |         decay : .005, 
+                |         sustain : .2, 
+                |         hold : .015, 
+                |         release : .3
+                |     }, 
+                |     filter : {
+                |         type : 'lowpass', 
+                |         frequency : 1200, 
+                |         q : 8.5, 
+                |         env : {
+                |             attack : .2, 
+                |             frequency : 600
+                |         }
+                |     }
+                | })
+                | 
+                | piano.play({ pitch : 'C5' })
+                | piano.play({ pitch : 'Eb5', filter : { q : 15 } })
+                | piano.play({ pitch : 'F5', env : { release : .2 } })

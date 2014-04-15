@@ -1,0 +1,26 @@
+.row
+    .col-sm-1
+    .col-sm-10
+        h2.text-center Snare Drum
+        .space
+        p.p-text The snare drum in this song is synthesized using filtered noise. In this example, a band-pass filter is removing the noise above and below 300 hertz.  
+        .space
+        pre
+            code
+                | var snare = new Wad ({
+                |    source : 'noise', 
+                |     env : {
+                |         attack : .001, 
+                |         decay : .01, 
+                |         sustain : .2, 
+                |         hold : .03, 
+                |         release : .02
+                |     }, 
+                |     filter : {
+                |         type : 'bandpass', 
+                |         frequency : 300, 
+                |         q : .180
+                |     }
+                | })
+                | 
+                | snare.play()

@@ -1,0 +1,12 @@
+.row
+    .col-sm-1
+    .col-sm-10
+        h2.text-center Hihat Cymbals
+        .space
+        p.p-text The hi-hats in this song are synthesized using similar parameters as the snare drum. Rather than specifying the values manually, you can simply use a preset.
+        .space
+        pre
+            code
+                | var hatClosed = new Wad( Wad.presets.hiHatClosed )
+                | 
+                | hatClosed.play()
