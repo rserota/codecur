@@ -216,7 +216,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="row"><div class="col-sm-1"></div><div class="col-sm-10"><h2 class="text-center">Kick Drum</h2><div class="space"></div><p class="p-text">The kick drum in this song is just an audio file. Use a URL to an audio file as the source, and then call <code>play()</code> with no arguments. It doesn\'t get much simpler than this. </p><div class="space"></div><pre><code> \nvar kick = new Wad({ source : \'http://www.myServer.com/kick.wav\' })\n \nkick.play()</code></pre></div></div>');
+buf.push('<div class="row"><div class="col-sm-1"></div><div class="col-sm-10"><h2 class="text-center">Kick Drum</h2><div class="space"></div><p class="p-text">The kick drum in this song is just an audio file. Use a URL to an audio file as the source, and then call <code>play()</code> with no arguments. It doesn\'t get much simpler than this. </p><div class="space"></div><pre><code>var kick = new Wad({ source : \'http://www.myServer.com/kick.wav\' })\n \nkick.play()</code></pre></div></div>');
 }
 return buf.join("");
 }
