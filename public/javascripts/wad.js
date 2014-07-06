@@ -349,7 +349,7 @@ with special handling for reverb (ConvolverNode). **/
 
             if ( arg.filter[i].env || that.filter[i].env && !( that.source === "mic" ) ) {
                 filter.env = {
-                    attack : arg.filter[i].env.attack || that.filter[i].env.attack,
+                    attack : ( arg.filter[i].env && arg.filter[i].env.attack ) || that.filter[i].env.attack,
                     frequency : arg.filter[i].env.frequency || that.filter[i].env.frequency
                 }
             }
