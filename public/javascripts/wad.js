@@ -347,10 +347,10 @@ with special handling for reverb (ConvolverNode). **/
             filter.node.frequency.value = arg.filter[i] ? ( arg.filter[i].frequency || filter.frequency ) : filter.frequency
             filter.node.Q.value = arg.filter[i] ? ( arg.filter[i].q || filter.q ) : filter.q
 
-            if ( arg.filter[i].env || that.filter[i].env && !( that.source === "mic" ) ) {
+            if ( ( arg.filter[i].env || that.filter[i].env ) && !( that.source === "mic" ) ) {
                 filter.env = {
                     attack : ( arg.filter[i].env && arg.filter[i].env.attack ) || that.filter[i].env.attack,
-                    frequency : arg.filter[i].env.frequency || that.filter[i].env.frequency
+                    frequency : ( arg.filter[i].env && arg.filter[i].env.frequency ) || that.filter[i].env.frequency
                 }
             }
 
