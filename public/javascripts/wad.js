@@ -644,8 +644,7 @@ then finally play the sound by calling playEnv() **/
 
 /** If a Wad is created with reverb without specifying a URL for the impulse response,
 grab it from the defaultImpulse URL **/
-    // Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
-    Wad.defaultImpulse = 'localhost:8000/widehall.wav'
+    Wad.defaultImpulse = 'http://www.codecur.io/us/sendaudio/widehall.wav'
     Wad.setGlobalReverb = function(arg){
         Wad.reverb = {}
         Wad.reverb.node = context.createConvolver()
