@@ -75,6 +75,9 @@ module.exports = {
     songDemo : function(request, response){
         response.render('songdemo')
     },
+    game : function(request, response){
+        response.render('jam')
+    },
 
     sendAudio : function(request, response){
         console.log('params',request.params.file)

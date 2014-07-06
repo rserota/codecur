@@ -48,6 +48,7 @@ app.get('/us/archives/:url', myRoutes.archivedPost)
 app.get('/us/audiotest', myRoutes.audioTest)
 app.get('/us/songdemo', myRoutes.songDemo)
 app.get('/us/sendaudio/:file', myRoutes.sendAudio)
+app.get('/us/game', myRoutes.game)
 
 app.post('/submitblog', myRoutes.submitBlog)
 

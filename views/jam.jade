@@ -1,0 +1,38 @@
+doctype html
+html
+    head
+        title JAM
+        meta(name="viewport", content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no")
+        link(rel="stylesheet", href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+        link(rel="stylesheet", href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
+        link(rel='stylesheet', href='/stylesheets/jam.css')
+
+
+    body
+
+        //- i.fa.fa-star.fa-2x.fa-spin
+        //- i.fa.fa-certificate.fa-2x.fa-spin
+        h4.text-center Score
+        .text-center
+            span.p1Score 00
+            span :
+            span.p2Score 00
+        h4.text-center Energy
+        .text-center
+            span.p1Energy 100
+            span :
+            span.p2Energy 100
+        .gameWindow
+            .lane.lane0
+            .lane.lane1
+            .lane.lane2
+            .lane.lane3
+            .lane.lane4
+
+
+
+        script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js")
+        script(src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js")
+        script(src="/javascripts/wad.js")
+        script(src="/javascripts/jam.js")
+
