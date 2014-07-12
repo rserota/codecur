@@ -277,8 +277,9 @@ as specified by the volume envelope and filter envelope **/
 
 /** When all the nodes are set up for this Wad, this function plugs them into each other,
 with special handling for reverb (ConvolverNode). **/
-    var plugEmIn = function(that){
+    var plugEmIn = function(that, arg){
         // console.log('plugemin', that)
+        var destination = ( arg && arg.destination ) || that.destination
         for ( var i = 1; i < that.nodes.length; i++ ) {
             that.nodes[i - 1].connect(that.nodes[i])
             if ( that.nodes[i] instanceof ConvolverNode ) {
@@ -286,11 +287,11 @@ with special handling for reverb (ConvolverNode). **/
             }
         }
 
-        that.nodes[that.nodes.length - 1].connect(that.destination)
+        that.nodes[that.nodes.length - 1].connect(destination)
         if ( Wad.reverb && that.globalReverb ) {
             that.nodes[that.nodes.length - 1].connect(Wad.reverb.node)
             Wad.reverb.node.connect(Wad.reverb.gain)
-            Wad.reverb.gain.connect(that.destination)
+            Wad.reverb.gain.connect(destination)
         }
     }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -466,7 +467,7 @@ then finally play the sound by calling playEnv() **/
 
         else if ( this.source === 'mic' ) {
             console.log('mic play')
-            plugEmIn(this)
+            plugEmIn(this, arg)
         }
 
         else {
@@ -518,7 +519,7 @@ then finally play the sound by calling playEnv() **/
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-            plugEmIn(this)
+            plugEmIn(this, arg)
 
             if ( this.filter && this.filter.env ) { filterEnv(this, arg) }
             playEnv(this, arg)
@@ -577,7 +578,7 @@ then finally play the sound by calling playEnv() **/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    Wad.poly = function(arg){
+    Wad.Poly = function(arg){
         this.wads = []
         this.input = context.createAnalyser()
         this.nodes = [this.input]
@@ -585,8 +586,8 @@ then finally play the sound by calling playEnv() **/
         this.volume = arg.volume || 1  
         this.output = context.createGain()
         this.output.gain.value = this.volume
-        this.output.connect(this.destination)
-        this.rec = new Recorder(multiwad.node, {workerPath: 'src/Recorderjs/recorderWorker.js'})
+        // this.output.connect(this.destination)
+        this.rec = new Recorder(this.output, {workerPath: 'src/Recorderjs/recorderWorker.js'})
 
 
         this.playable = 1 // if this is less than 1, this Wad is still waiting for a file to download before it can play
@@ -605,7 +606,8 @@ then finally play the sound by calling playEnv() **/
         constructPanning(this, arg)
         setUpPanningOnPlay(this, arg)
 
-        plugEmIn(this)
+        this.nodes.push(this.output)
+        plugEmIn(this, arg)
 
         this.setVolume = function(volume){
             this.output.gain.value = volume
@@ -634,11 +636,32 @@ then finally play the sound by calling playEnv() **/
         }
 
         this.add = function(wad){
+            wad.destination = this.input
+            this.wads.push(wad)
+            if ( wad instanceof Wad.Poly ) {
+                console.log('poly!')
+                wad.output.disconnect(0)
+                wad.output.connect(this.input)
+            }
+        }
 
+
+
+        this.remove = function(wad){
+            for ( var i = 0; i < this.wads.length; i++ ) {
+                if ( this.wads[i] === wad ) {
+                    this.wads[i].destination = context.destination
+                    this.wads.splice(i,1)
+                    if ( wad instanceof Wad.Poly ) {
+                        wad.output.disconnect(0)
+                        wad.output.connect(context.destination)
+                    }
+                }
+            }
         }
     }
 
-    Wad.poly.prototype.constructExternalFx = function(arg, context){
+    Wad.Poly.prototype.constructExternalFx = function(arg, context){
 
     }
 
